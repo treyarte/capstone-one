@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
+from models import connect_db, db, User, Stocker, ForkliftDriver
 
 app = Flask(__name__)
 
@@ -14,6 +15,8 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "this is my secret")
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 toolbar = DebugToolbarExtension(app)
+
+connect_db(app)
 
 @app.route("/")
 def homepage():
