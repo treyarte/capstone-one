@@ -2,4 +2,4 @@
 
 ### API
 
-##### [Google Charts](https://developers.google.com/chart)
+##### [QuickChart](https://quickchart.io/)
