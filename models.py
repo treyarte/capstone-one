@@ -2,6 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -129,7 +130,11 @@ class Request(db.Model):
 
     forklift_driver_id = db.Column(db.Integer, db.ForeignKey("forklift_drivers.id"), nullable=True)
 
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+
     items = db.relationship("Item", secondary="request_items", backref="request")
+
+
 
 class Location(db.Model):
     """A place where items are located"""
