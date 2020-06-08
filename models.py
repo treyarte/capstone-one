@@ -1,8 +1,11 @@
 """SLQAlchemy models for mydroplist"""
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
+bcrypt = Bcrypt()
+
 
 class User(db.Model):
     """User model"""
@@ -32,6 +35,43 @@ class User(db.Model):
     forklift_driver = db.relationship("ForkliftDriver", backref="user", uselist=False)
     stocker = db.relationship("Stocker", backref="user", uselist=False)
 
+    def __repr__(self):
+        return f"<User #{self.id}: {self.first_name} {self.last_name} {self.email}>"
+
+    @classmethod
+    def sign_up(cls, first_name, last_name, email, department, password, image_url=None):
+        """Sign users up and hash passwords"""
+
+        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+
+        user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            department=department,
+            password=hashed_pwd,
+            image_url=image_url
+        )
+
+        db.session.add(user)
+        return user
+
+
+    @classmethod
+    def authenticate(cls, email, password):
+        """Finds and returns the user if their password hash match"""
+
+        #The reason for using first over one is because first will return none if not found.
+        #One would return an exception if not found.
+        user = cls.query.filter_by(email=email).first()
+
+        if user:
+            is_auth = bcrypt.check_password_hash(user.password, password)
+
+            if is_auth:
+                return user
+        
+        return False
 class ForkliftDriver(db.Model):
     """A user that receives and completes a request"""
 
