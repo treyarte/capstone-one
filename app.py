@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User, Stocker, ForkliftDriver, Request, Location, RequestItem, Item
+from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
 
 app = Flask(__name__)
 

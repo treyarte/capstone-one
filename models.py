@@ -74,7 +74,7 @@ class User(db.Model):
         
         return False
 class ForkliftDriver(db.Model):
-    """A user that receives and completes a request"""
+    """A user that receives and completes a drop list"""
 
     __tablename__ = "forklift_drivers"
 
@@ -90,11 +90,11 @@ class ForkliftDriver(db.Model):
         nullable=False
     )
 
-    requests = db.relationship("Request", backref="forklift_driver")
+    drop_list = db.relationship("DropList", backref="forklift_driver")
 
 
 class Stocker(db.Model):
-    """A user that makes a request"""
+    """A user that makes a drop list"""
 
     __tablename__= "stockers"
 
@@ -110,19 +110,17 @@ class Stocker(db.Model):
         nullable=False
     )
 
-    requests = db.relationship("Request", backref="stocker")
+    drop_list = db.relationship("DropList", backref="stocker")
 
 
-class Request(db.Model):
-    """A request created by a stocker and sent to a driver"""
+class DropList(db.Model):
+    """A droplist created by a stocker and sent to a driver"""
 
-    __tablename__= "requests"
+    __tablename__= "drop_lists"
 
     id = db.Column(db.Integer, primary_key=True)
     
-    request_type = db.Column(db.Text, nullable=False, default="droplist")
-    
-    description = db.Column(db.Text, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
     
     is_complete = db.Column(db.Boolean, nullable=False, default=False)
     
@@ -132,9 +130,12 @@ class Request(db.Model):
 
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
 
-    items = db.relationship("Item", secondary="request_items", backref="request")
+    items = db.relationship("Item", secondary="drop_list_items", cascade="all,delete", backref="drop_list")
 
-
+    def add_item(self, item_id):
+        """add an item to the droplist"""
+        drop_list_item = DropListItem(drop_list_id=self.id, item_id=item_id)
+        return drop_list_item
 
 class Location(db.Model):
     """A place where items are located"""
@@ -154,7 +155,7 @@ class Location(db.Model):
     items = db.relationship("Item", backref="location")
 
 class Item(db.Model):
-    """Items the stocker is requesting for"""
+    """Items that is that will be on the droplist"""
 
     __tablename__ = "items"
 
@@ -167,20 +168,21 @@ class Item(db.Model):
     column_number = db.Column(db.Integer, nullable=False)
 
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=False)
+    
 
-class RequestItem(db.Model):
-    """Connects request to Items"""
+class DropListItem(db.Model):
+    """Connects the drop list to Items"""
 
-    __tablename__ = "request_items"
+    __tablename__ = "drop_list_items"
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    request_id = db.Column(
+    drop_list_id = db.Column(
         db.Integer,
-        db.ForeignKey("requests.id") 
+        db.ForeignKey("drop_lists.id") 
     )
 
     item_id = db.Column(
