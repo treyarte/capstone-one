@@ -2,8 +2,8 @@ import os
 from flask import Flask, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
-from forms import SignUpForm
 from sqlalchemy.exc import IntegrityError
+from forms import SignUpForm, LoginForm
 
 app = Flask(__name__)
 
@@ -42,13 +42,30 @@ def signUp():
             )
             db.session.commit()
         except IntegrityError:
-            flash("Email is already in use")
+            flash("Email is already in use", "danger")
             return render_template("users/signup.html", form=form)
             
 
         return redirect("/")
     
     return render_template("users/signup.html", form=form)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Authenticate a user"""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.authenticate(email=form.email.data, password=form.password.data)
+
+        if user:
+            flash("Successfully signed in", "success")
+            return redirect("/")
+        else:
+            flash("Invalid Login/Password combination")
+
+    return render_template("users/login.html", form=form)
 
 # @app.after_request
 # def add_header(req):

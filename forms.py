@@ -28,3 +28,7 @@ class SignUpForm(FlaskForm):
     image_url = StringField("Image", validators=[Optional()])
 
     user_type = RadioField("Are you a...", validators=[InputRequired()], choices=[("Stocker", "stocker"), ("Forklift Driver", "driver")])
+class LoginForm(FlaskForm):
+    """Form for authenticating a user"""
+    email = StringField("Email", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
