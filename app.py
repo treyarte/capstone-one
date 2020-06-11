@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
 from forms import SignUpForm
-from sqlalchemy.exec import IntegrityError
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
