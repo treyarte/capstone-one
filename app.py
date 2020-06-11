@@ -1,7 +1,9 @@
 import os
-from flask import Flask
+from flask import Flask, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
+from forms import SignUpForm
+from sqlalchemy.exec import IntegrityError
 
 app = Flask(__name__)
 
@@ -22,6 +24,31 @@ connect_db(app)
 def homepage():
     """Home page of the application"""
     return("Hello World")
+
+@app.route("/sign-up", methods=["GET", "POST"])
+def signUp():
+    """Signs a user up to the system"""
+    form = SignUpForm()
+
+    if form.validate_on_submit():
+        try:
+            user = User.sign_up(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                email = form.email.data,
+                department = form.department.data,
+                password = form.password.data,
+                image_url = form.image_url.data
+            )
+            db.session.commit()
+        except IntegrityError:
+            flash("Email is already in use")
+            return render_template("users/signup.html", form=form)
+            
+
+        return redirect("/")
+    
+    return render_template("users/signup.html", form=form)
 
 # @app.after_request
 # def add_header(req):
