@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField
-from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField, IntegerField
+from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange
 
 class SignUpForm(FlaskForm):
     """Form that signup users"""
@@ -32,3 +32,17 @@ class LoginForm(FlaskForm):
     """Form for authenticating a user"""
     email = StringField("Email", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
+
+class DropListForm(FlaskForm):
+    notes = TextAreaField("Notes", validators=(Optional(), Length(max=200)))
+
+class LocationForm(FlaskForm):
+    """Location form"""
+    location = StringField("Location", validators=[InputRequired()])
+
+class ItemForm(FlaskForm):
+    """Form for items"""
+    row_letter = SelectField("Row", validators=[InputRequired()], choices=[("A", "a"), ("B", "b"), ("C", "c")])
+    column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
+    description = StringField("Description")
+    location_id = SelectField("Location", validators=[InputRequired()], coerce=int)

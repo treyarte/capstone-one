@@ -6,6 +6,9 @@
     <title>Document</title>
   </head>
   <body>
+    <form action="/logout" method="post">
+      <button type="submit">Log out</button>
+    </form>
     {%with messages = get_flashed_messages(with_categories=true)%} {%if
     messages%}
     <div class="container">

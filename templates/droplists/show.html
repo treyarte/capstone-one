@@ -1,0 +1,9 @@
+{%extends "base.html"%}{%block content%} {{drop_list.notes}}
+<div>
+  {%if drop_list.items%} {%for item in drop_list.items%}
+  <div>
+    {{item.description}}
+  </div>
+  {%endfor%} {%endif%}
+</div>
+{%endblock%}
