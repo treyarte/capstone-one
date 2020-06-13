@@ -179,6 +179,21 @@ def edit_drop_list(drop_list_id):
     
     return render_template("/droplists/edit.html", form=form)
 
+@app.route("/droplist/<int:drop_list_id>/delete")
+@authorize
+def delete_droplist(drop_list_id):
+    """Delete a droplist"""
+    drop_list = DropList.query.get_or_404(drop_list_id)
+
+    if g.user.stocker.id != drop_list.stocker_id:
+        flash("Unauthorized Access", "danger")
+        return redirect("/")
+
+    db.session.delete(drop_list)
+    db.session.commit()
+
+    return redirect("/")
+
 @app.route("/droplist/<int:drop_list_id>/items/add", methods=["GET","POST"])
 @authorize
 def add_item_to_drop_list(drop_list_id):
