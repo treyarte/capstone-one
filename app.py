@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
 from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
+from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm, set_choices
 from functools import wraps
 
 app = Flask(__name__)
@@ -48,12 +48,10 @@ def authorize(func):
 
 def handle_login(user):
     """Log a user in"""
-
     session[CURR_USER_KEY] = user.id
 
 def handle_logout():
     """Remove the user from the session to log them out"""
-
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
@@ -81,8 +79,15 @@ def signUp():
             )
             
             db.session.commit()
-
-
+        
+            if form.user_type.data == "stocker":
+                stocker = Stocker(user_id = user.id)
+                db.session.add(stocker)
+                db.session.commit()
+            elif form.user_type.data == "driver":
+                driver = ForkliftDriver(user_id = user.id)
+                db.session.add(stocker)
+                db.session.commit()
 
         except IntegrityError:
             flash("Email is already in use", "danger")
@@ -129,8 +134,10 @@ def create_droplist():
     """create a new droplist"""
     form = DropListForm()
 
+    form.set_choices(db, ForkliftDriver, User)
+
     if form.validate_on_submit():
-        drop_list = DropList(stocker_id=1, notes=form.notes.data)
+        drop_list = DropList(stocker_id=g.user.stocker.id, notes=form.notes.data, forklift_driver_id = form.forklift_driver_id.data)
         db.session.add(drop_list)
         db.session.commit()
         
@@ -147,17 +154,42 @@ def show_drop_list(drop_list_id):
 
     return render_template("droplists/show.html", drop_list=drop_list)
 
-@app.route("/droplist/<int:drop_list_id>/add_items", methods=["GET","POST"])
+@app.route("/droplist/<int:drop_list_id>/edit", methods=["GET", "POST"])
+@authorize
+def edit_drop_list(drop_list_id):
+    """Allow the user to edit their drop list"""
+    drop_list = DropList.query.get_or_404(drop_list_id)
+
+    if g.user.stocker.id != drop_list.stocker_id:
+        flash("Unauthorized access")
+        return redirect("/")
+    
+    form = DropListForm(obj=drop_list)
+
+    form.set_choices(db, ForkliftDriver, User)
+
+    if form.validate_on_submit():
+        drop_list.notes = form.notes.data
+        drop_list.forklift_driver_id = form.forklift_driver_id.data
+
+        db.session.commit()
+
+        flash("Drop list successfully updated")
+        return redirect(f"/droplist/{drop_list_id}")
+    
+    return render_template("/droplists/edit.html", form=form)
+
+@app.route("/droplist/<int:drop_list_id>/items/add", methods=["GET","POST"])
 @authorize
 def add_item_to_drop_list(drop_list_id):
+    """Add an item to the drop list"""
     drop_list = DropList.query.get_or_404(drop_list_id)
+    
     form = ItemForm()
 
-    locations = db.session.query(Location.id, Location.name).all()
+    choices = set_choices(db, Location)
 
-    loc_choices = locations
-
-    form.location_id.choices = loc_choices
+    form.location_id.choices = choices
 
     if form.validate_on_submit():
         item = Item(
@@ -177,6 +209,7 @@ def add_item_to_drop_list(drop_list_id):
         return redirect(f"/droplist/{drop_list.id}")
 
     return render_template("/droplist_items/new.html", form=form)
+
 #####################################################
 # Location and items requests
 

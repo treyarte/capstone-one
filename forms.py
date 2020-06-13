@@ -34,7 +34,13 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired()])
 
 class DropListForm(FlaskForm):
-    notes = TextAreaField("Notes", validators=(Optional(), Length(max=200)))
+    notes = TextAreaField("Notes", validators=[Optional(), Length(max=200)])
+    forklift_driver_id = SelectField("Forklift Driver", validators=[Optional()], coerce=int)
+
+    def set_choices(self, db, ForkliftDriver, User):
+        self.forklift_driver_id.choices = db.session.query(
+                                        ForkliftDriver.id, User.first_name +" "+ User.last_name).join(
+                                            ForkliftDriver, User.id == ForkliftDriver.user_id).all()
 
 class LocationForm(FlaskForm):
     """Location form"""
@@ -46,3 +52,9 @@ class ItemForm(FlaskForm):
     column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
     description = StringField("Description")
     location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
+
+
+def set_choices(self, db, obj):
+    choices = db.session.query(obj.id, obj.name).all()
+
+    return choices

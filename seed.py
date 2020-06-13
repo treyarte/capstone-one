@@ -6,8 +6,8 @@ from models import User, Stocker, ForkliftDriver, DropList, DropListItem, Locati
 db.drop_all()
 db.create_all()
 
-user1 = User.sign_up("Trey", "Akimoto", "123@gmail.com", "hardlines", "qwerty123","https://i.ytimg.com/vi/7lg0ZnDxoJ4/maxresdefault.jpg")
-user2 = User.sign_up("Roy", "Ourboy", "321@gmail.com", "hardlines", "123qwerty")
+user1 = User.sign_up("Trey", "Akimoto", "123@gmail.com", "hardlines", "Qwerty123!","https://i.ytimg.com/vi/7lg0ZnDxoJ4/maxresdefault.jpg")
+user2 = User.sign_up("Roy", "Ourboy", "321@gmail.com", "hardlines", "123Qwerty!")
 
 location1 = Location(name="S409") 
 location2 = Location(name="S408")

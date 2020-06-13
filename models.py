@@ -76,6 +76,11 @@ class User(db.Model):
 class ForkliftDriver(db.Model):
     """A user that receives and completes a drop list"""
 
+    @property
+    def full_name(self):
+        full_name = db.session.query(User.first_name, User.last_name).join(ForkliftDriver, User.id == ForkliftDriver.user_id).first()
+        return " ".join(full_name)
+
     __tablename__ = "forklift_drivers"
 
     id = db.Column(
