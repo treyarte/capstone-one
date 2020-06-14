@@ -49,13 +49,13 @@ def authorize(func):
 def check_owner(func):
     """decorator that check if a user is the owner of a droplist"""
     @wraps(func)
-    def inner_function(droplist_id):
+    def inner_function(droplist_id, *args,**kwargs):
         drop_list = DropList.query.get_or_404(droplist_id)
 
         if g.user.stocker.id != drop_list.stocker_id:
             flash("Unauthorized access")
             return redirect("/")
-        return func(droplist_id)
+        return func(droplist_id, *args,**kwargs)
     return inner_function
     
 
@@ -67,6 +67,19 @@ def handle_logout():
     """Remove the user from the session to log them out"""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
+def check_item_in_droplist(droplist_id, item_id):
+    """check if an item is in the specified droplist"""
+    droplist = DropList.query.get_or_404(droplist_id)
+    #checking to see if the item even exists
+    Item.query.get_or_404(item_id)
+
+    item = db.session.query(Item).join(
+                                DropListItem, Item.id==DropListItem.item_id).join(
+                                DropList, DropList.id == DropListItem.drop_list_id).filter(
+                                Item.id==item_id).filter(DropList.id==droplist_id).first()
+
+    return [droplist, item]
 
 @app.route("/")
 def homepage():
@@ -173,10 +186,6 @@ def show_drop_list(drop_list_id):
 def edit_drop_list(droplist_id):
     """Allow the user to edit their drop list"""
     droplist = DropList.query.get_or_404(droplist_id)
-
-    # if g.user.stocker.id != drop_list.stocker_id:
-    #     flash("Unauthorized access")
-    #     return redirect("/")
     
     form = DropListForm(obj=droplist)
 
@@ -193,19 +202,17 @@ def edit_drop_list(droplist_id):
     
     return render_template("/droplists/edit.html", form=form)
 
-@app.route("/droplist/<int:drop_list_id>/delete")
+@app.route("/droplist/<int:droplist_id>/delete")
 @authorize
-def delete_droplist(drop_list_id):
+@check_owner
+def delete_droplist(droplist_id):
     """Delete a droplist"""
-    drop_list = DropList.query.get_or_404(drop_list_id)
+    droplist = DropList.query.get_or_404(droplist_id)
 
-    if g.user.stocker.id != drop_list.stocker_id:
-        flash("Unauthorized Access", "danger")
-        return redirect("/")
-
-    db.session.delete(drop_list)
+    db.session.delete(droplist)
     db.session.commit()
 
+    flash("droplist was successfully deleted", "success")
     return redirect("/")
 
 #####################################################
@@ -217,7 +224,7 @@ def show_droplist_items(droplist_id):
     """Show items that are in the droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
 
-    return render_template("/droplist_items/show.html", droplist=droplist)
+    return render_template("/droplist_items/index.html", droplist=droplist)
 
 @app.route("/droplist/<int:droplist_id>/items/add", methods=["GET","POST"])
 @authorize
@@ -249,10 +256,69 @@ def add_item_to_drop_list(droplist_id):
 
     return render_template("/droplist_items/new.html", form=form)
 
+@app.route("/droplist/<int:droplist_id>/items/<int:item_id>")
+@authorize
+def show_item(droplist_id,item_id):
+    """show a specific item in a droplist"""
+    droplist, item = check_item_in_droplist(droplist_id, item_id)
+
+    if item == None:
+        #for now
+        return redirect(404)
+
+    return render_template("/droplist_items/show.html", item=item)
+
+@app.route("/droplist/<int:droplist_id>/items/<int:item_id>/edit", methods=["GET", "POST"])
+@authorize
+@check_owner
+def edit_droplist_item(droplist_id, item_id):
+    """edit a droplist item"""
+    droplist, item = check_item_in_droplist(droplist_id, item_id)
+
+    if item == None:
+        #for now
+        return redirect(404)
+
+    form = ItemForm(obj=item)
+
+    form.set_choices(db, Location)
+
+    if form.validate_on_submit():
+        item.description = form.description.data
+        item.row_letter = form.row_letter.data
+        item.column_number = form.column_number.data
+        item.location_id = form.location_id.data
+
+        db.session.commit()
+
+        flash("Item successfully updated")
+        return redirect(f"/droplist/{droplist_id}/items/{item_id}")
+
+    return render_template("/droplist_items/edit.html", form=form)
+
+@app.route("/droplist/<int:droplist_id>/items/<int:item_id>/delete")
+@authorize
+@check_owner
+def delete_droplist_item(droplist_id, item_id):
+    """delete an item from a droplist"""
+    droplist, item = check_item_in_droplist(droplist_id, item_id)
+
+    if item == None:
+        #for now
+        return redirect(404)
+    
+    db.session.delete(item)
+    db.session.commit()
+
+    flash("successfully deleted the item", "success")
+    return redirect(f"/droplist/{droplist.id}/items")
+
+
+
 #####################################################
 # Location routes
 
-@app.route("/location/new", methods=["GET", "POST"])
+@app.route("/locations/new", methods=["GET", "POST"])
 @authorize
 def create_location(drop_list_id):
     """Creates a location for a drop list item"""
@@ -265,6 +331,30 @@ def create_location(drop_list_id):
         return redirect(f"/locations/{location.id}", location=location)
     
     return render_template("locations/form.html", form=form)
+
+@app.route("/locations/<int:location_id>")
+def show_location(location_id):
+    """Show a location"""
+    location = Location.query.get_or_404(location_id)
+    return render_template("/locations/show.html", location=location)
+
+@app.route("/locations/<int:location_id>/edit", methods=["GET", "POST"])
+def edit_location(location_id):
+    """edit a location"""
+    location = Location.query.get_or_404(location_id)
+
+    form = LocationForm(obj=location)
+
+    if form.validate_on_submit():
+        location.name = form.name.data
+
+        db.session.commit()
+        
+        flash("Location successfully updated")
+        return redirect(f"/locations/{location.id}")
+    
+    return render_template("/locations/edit.html", form=form)
+
 
 
 # @app.after_request
