@@ -320,7 +320,7 @@ def delete_droplist_item(droplist_id, item_id):
 
 @app.route("/locations/new", methods=["GET", "POST"])
 @authorize
-def create_location(drop_list_id):
+def create_location():
     """Creates a location for a drop list item"""
     form = LocationForm()
 
@@ -328,17 +328,19 @@ def create_location(drop_list_id):
         location = Location(name=form.location.data)
         db.session.add(location)
         db.session.commit()
-        return redirect(f"/locations/{location.id}", location=location)
+        return redirect(f"/locations/{location.id}")
     
-    return render_template("locations/form.html", form=form)
+    return render_template("locations/new.html", form=form)
 
 @app.route("/locations/<int:location_id>")
+@authorize
 def show_location(location_id):
     """Show a location"""
     location = Location.query.get_or_404(location_id)
     return render_template("/locations/show.html", location=location)
 
 @app.route("/locations/<int:location_id>/edit", methods=["GET", "POST"])
+@authorize
 def edit_location(location_id):
     """edit a location"""
     location = Location.query.get_or_404(location_id)
@@ -354,6 +356,18 @@ def edit_location(location_id):
         return redirect(f"/locations/{location.id}")
     
     return render_template("/locations/edit.html", form=form)
+
+@app.route("/locations/<int:location_id>/delete", methods=["POST"])
+@authorize
+def delete_location(location_id):
+    """delete a location"""
+    location = Location.query.get_or_404(location_id)
+
+    db.session.delete(location)
+    db.session.commit()
+
+    flash("Location successfully deleted")
+    return redirect("/")
 
 
 

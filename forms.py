@@ -44,7 +44,7 @@ class DropListForm(FlaskForm):
 
 class LocationForm(FlaskForm):
     """Location form"""
-    location = StringField("Location", validators=[InputRequired()])
+    name = StringField("Location", validators=[InputRequired()])
 
 class ItemForm(FlaskForm):
     """Form for items"""
