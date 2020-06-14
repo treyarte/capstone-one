@@ -53,8 +53,5 @@ class ItemForm(FlaskForm):
     description = StringField("Description")
     location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
 
-
-def set_choices(self, db, obj):
-    choices = db.session.query(obj.id, obj.name).all()
-
-    return choices
+    def set_choices(self, db, obj):
+        self.location_id.choices = db.session.query(obj.id, obj.name).all()

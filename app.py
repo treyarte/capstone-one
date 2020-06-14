@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
 from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm, set_choices
+from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
 from functools import wraps
 
 app = Flask(__name__)
@@ -35,7 +35,7 @@ def add_global_user():
         g.user = None
 
 def authorize(func):
-    """decorator tha check if a user is authorize"""
+    """decorator that check if a user is authorize"""
     @wraps(func)
     def inner_function(*args, **kwargs):
         if not g.user:
@@ -45,6 +45,19 @@ def authorize(func):
     #either use wraps or below to prevent overwritting of endpoints
     # inner_function.__name__ = func.__name__
     return inner_function
+
+def check_owner(func):
+    """decorator that check if a user is the owner of a droplist"""
+    @wraps(func)
+    def inner_function(droplist_id):
+        drop_list = DropList.query.get_or_404(droplist_id)
+
+        if g.user.stocker.id != drop_list.stocker_id:
+            flash("Unauthorized access")
+            return redirect("/")
+        return func(droplist_id)
+    return inner_function
+    
 
 def handle_login(user):
     """Log a user in"""
@@ -154,28 +167,29 @@ def show_drop_list(drop_list_id):
 
     return render_template("droplists/show.html", drop_list=drop_list)
 
-@app.route("/droplist/<int:drop_list_id>/edit", methods=["GET", "POST"])
+@app.route("/droplist/<int:droplist_id>/edit", methods=["GET", "POST"])
 @authorize
-def edit_drop_list(drop_list_id):
+@check_owner
+def edit_drop_list(droplist_id):
     """Allow the user to edit their drop list"""
-    drop_list = DropList.query.get_or_404(drop_list_id)
+    droplist = DropList.query.get_or_404(droplist_id)
 
-    if g.user.stocker.id != drop_list.stocker_id:
-        flash("Unauthorized access")
-        return redirect("/")
+    # if g.user.stocker.id != drop_list.stocker_id:
+    #     flash("Unauthorized access")
+    #     return redirect("/")
     
-    form = DropListForm(obj=drop_list)
+    form = DropListForm(obj=droplist)
 
     form.set_choices(db, ForkliftDriver, User)
 
     if form.validate_on_submit():
-        drop_list.notes = form.notes.data
-        drop_list.forklift_driver_id = form.forklift_driver_id.data
+        droplist.notes = form.notes.data
+        droplist.forklift_driver_id = form.forklift_driver_id.data
 
         db.session.commit()
 
         flash("Drop list successfully updated")
-        return redirect(f"/droplist/{drop_list_id}")
+        return redirect(f"/droplist/{droplist_id}")
     
     return render_template("/droplists/edit.html", form=form)
 
@@ -194,17 +208,27 @@ def delete_droplist(drop_list_id):
 
     return redirect("/")
 
-@app.route("/droplist/<int:drop_list_id>/items/add", methods=["GET","POST"])
+#####################################################
+# Droplist items routes
+
+@app.route("/droplist/<int:droplist_id>/items")
 @authorize
-def add_item_to_drop_list(drop_list_id):
+def show_droplist_items(droplist_id):
+    """Show items that are in the droplist"""
+    droplist = DropList.query.get_or_404(droplist_id)
+
+    return render_template("/droplist_items/show.html", droplist=droplist)
+
+@app.route("/droplist/<int:droplist_id>/items/add", methods=["GET","POST"])
+@authorize
+@check_owner
+def add_item_to_drop_list(droplist_id):
     """Add an item to the drop list"""
-    drop_list = DropList.query.get_or_404(drop_list_id)
+    droplist = DropList.query.get_or_404(droplist_id)
     
     form = ItemForm()
 
-    choices = set_choices(db, Location)
-
-    form.location_id.choices = choices
+    form.set_choices(db, Location)
 
     if form.validate_on_submit():
         item = Item(
@@ -217,16 +241,16 @@ def add_item_to_drop_list(drop_list_id):
         db.session.add(item)
         db.session.commit()
 
-        drop_list.items.append(item)
+        droplist.items.append(item)
 
         db.session.commit()
 
-        return redirect(f"/droplist/{drop_list.id}")
+        return redirect(f"/droplist/{droplist.id}")
 
     return render_template("/droplist_items/new.html", form=form)
 
 #####################################################
-# Location and items requests
+# Location routes
 
 @app.route("/location/new", methods=["GET", "POST"])
 @authorize
