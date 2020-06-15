@@ -24,13 +24,6 @@ class DropListModelTestCase(TestCase):
 
         for model in [DropListItem, DropList, Item, Location, Stocker, ForkliftDriver, User]:
             model.query.delete()
-        # RequestItem.query.delete()
-        # Request.query.delete()
-        # Item.query.delete()
-        # Location.query.delete()
-        # Stocker.query.delete()
-        # ForkliftDriver.query.delete()
-        # User.query.delete()
 
         self.client = app.test_client()
 
