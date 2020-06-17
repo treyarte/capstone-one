@@ -7,6 +7,16 @@ from datetime import datetime
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+class Role(db.Model):
+    """Role model"""
+
+    __tablename__="roles"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    role = db.Column(db.Text, nullable=False)
+    
+    users = db.relationship("User", backref="current_role")
 
 class User(db.Model):
     """User model"""
@@ -27,6 +37,8 @@ class User(db.Model):
 
     password = db.Column(db.Text,nullable=False)
 
+    current_role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
+
     image_url = db.Column(
         db.Text,
         nullable=True,
@@ -35,6 +47,7 @@ class User(db.Model):
 
     forklift_driver = db.relationship("ForkliftDriver", backref="user", uselist=False)
     stocker = db.relationship("Stocker", backref="user", uselist=False)
+    
 
     @property
     def get_stocker(self):
@@ -55,7 +68,7 @@ class User(db.Model):
         return f"<User #{self.id}: {self.first_name} {self.last_name} {self.email}>"
 
     @classmethod
-    def sign_up(cls, first_name, last_name, email, department, password, image_url=None):
+    def sign_up(cls, first_name, last_name, email, department, password, current_role_id, image_url=None):
         """Sign users up and hash passwords"""
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
@@ -66,7 +79,8 @@ class User(db.Model):
             email=email,
             department=department,
             password=hashed_pwd,
-            image_url=image_url
+            image_url=image_url,
+            current_role_id=current_role_id
         )
 
         db.session.add(user)
@@ -110,7 +124,7 @@ class ForkliftDriver(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref="forklift_driver")
+    drop_list = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="all, delete"))
 
 
 class Stocker(db.Model):
@@ -130,32 +144,27 @@ class Stocker(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref="stocker")
+    drop_list = db.relationship("DropList", backref=db.backref("stocker", cascade="all, delete"))
 
 
 class DropList(db.Model):
     """A droplist created by a stocker and sent to a driver"""
 
-    __tablename__= "drop_lists"
+    __tablename__= "droplists"
 
     id = db.Column(db.Integer, primary_key=True)
     
-    notes = db.Column(db.Text, nullable=True)
+    department = db.Column(db.Text, nullable=False)
     
     is_complete = db.Column(db.Boolean, nullable=False, default=False)
     
-    stocker_id = db.Column(db.Integer, db.ForeignKey("stockers.id"), nullable=False)
+    stocker_id = db.Column(db.Integer, db.ForeignKey("stockers.id", ondelete="CASCADE"), nullable=False)
 
-    forklift_driver_id = db.Column(db.Integer, db.ForeignKey("forklift_drivers.id"), nullable=True)
+    forklift_driver_id = db.Column(db.Integer, db.ForeignKey("forklift_drivers.id", ondelete="SET NULL"), nullable=True)
 
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
 
-    items = db.relationship("Item", secondary="drop_list_items", cascade="all,delete", backref="drop_list")
-
-    def add_item(self, item_id):
-        """add an item to the droplist"""
-        drop_list_item = DropListItem(drop_list_id=self.id, item_id=item_id)
-        return drop_list_item
+    # items = db.relationship("Item", cascade="all,delete", backref="droplist")
 
 class Location(db.Model):
     """A place where items are located"""
@@ -188,29 +197,10 @@ class Item(db.Model):
     column_number = db.Column(db.Integer, nullable=False)
 
     location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=False)
-    
 
-class DropListItem(db.Model):
-    """Connects the drop list to Items"""
+    droplist_id = db.Column(db.Integer, db.ForeignKey("droplists.id", ondelete="CASCADE"), nullable=False)
 
-    __tablename__ = "drop_list_items"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    drop_list_id = db.Column(
-        db.Integer,
-        db.ForeignKey("drop_lists.id") 
-    )
-
-    item_id = db.Column(
-        db.Integer,
-        db.ForeignKey("items.id")
-    )
-
-
+    droplist = db.relationship("DropList", backref=db.backref("items", cascade="all, delete"))
 
 def connect_db(app):
     """connect this database to the flask app"""

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User, Stocker, ForkliftDriver, DropList, Location, DropListItem, Item
+from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
 from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
 from functools import wraps

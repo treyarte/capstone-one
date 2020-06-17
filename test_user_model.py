@@ -3,8 +3,8 @@
 import os
 from unittest import TestCase
 
-from models import db, User, ForkliftDriver, Stocker
-from sqlalchemy.exc import IntegrityError
+from models import db, User, ForkliftDriver, Stocker, Role
+
 
 os.environ["DATABASE_URL"] = "postgresql:///mydroplist-test"
 
@@ -12,27 +12,40 @@ from app import app
 
 app.config["SQLALCHEMY_ECHO"] = False
 
+db.session.rollback()
 db.create_all()
+
 
 class UserModelTestCase(TestCase):
     """Test cases for the user model"""
 
     def setUp(self):
         """create sample data"""
+        db.session.rollback()
 
         Stocker.query.delete()
         ForkliftDriver.query.delete()
         User.query.delete()
+        Role.query.delete()
 
+        role1 = Role(role="stocker")
+        role2 = Role(role="forklift_driver")
+
+        db.session.add_all([role1,role2])
+        db.session.commit()
+
+        self.role1 = role1
+        self.role2 = role2
+        
         user = User.sign_up(
                             first_name="Test", last_name="Person", 
                             email="test@person.com", department="sundrys", 
-                            password="Qwerty123!")
+                            password="Qwerty123!", current_role_id=role1.id)
 
         test_user = User.sign_up(
                             first_name="Test", last_name="User", 
                             email="test@user.com", department="sundrys", 
-                            password="Qwerty123!")
+                            password="Qwerty123!", current_role_id=role2.id)
 
         db.session.commit()
 
@@ -55,7 +68,7 @@ class UserModelTestCase(TestCase):
         user = User.sign_up(
                             first_name="Test2", last_name="Person2", 
                             email="test@person2.com", department="sundrys", 
-                            password="Qwerty123!")
+                            password="Qwerty123!", current_role_id=self.role1.id)
         
         self.assertIsInstance(user,User)
         self.assertEqual(user.first_name, "Test2")
@@ -85,5 +98,3 @@ class UserModelTestCase(TestCase):
 
         self.assertIsInstance(self.test_user.get_driver, ForkliftDriver)
         self.assertIsNone(self.user.get_driver)
-
-    # def test_get_driver(self):
