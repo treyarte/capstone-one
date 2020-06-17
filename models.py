@@ -36,6 +36,21 @@ class User(db.Model):
     forklift_driver = db.relationship("ForkliftDriver", backref="user", uselist=False)
     stocker = db.relationship("Stocker", backref="user", uselist=False)
 
+    @property
+    def get_stocker(self):
+        stocker = db.session.query(Stocker).join(
+                    User, User.id==Stocker.user_id).filter(
+                    Stocker.user_id == self.id).first()
+
+        return stocker
+    @property
+    def get_driver(self):
+        driver = db.session.query(ForkliftDriver).join(
+                    User, User.id==ForkliftDriver.user_id).filter(
+                    ForkliftDriver.user_id == self.id).first()
+
+        return driver
+
     def __repr__(self):
         return f"<User #{self.id}: {self.first_name} {self.last_name} {self.email}>"
 
