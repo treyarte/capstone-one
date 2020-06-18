@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
+from forms import SignUpForm, LoginForm, LocationForm, ItemForm, CreateDropListForm
 from functools import wraps
 
 app = Flask(__name__)
@@ -203,33 +203,59 @@ def edit_user(user_id):
     
     return render_template("/users/edit.html", form=form)
 
+@app.route("/users/<int:user_id>/delete", methods=["POST"])
+@authorize
+@check_same_user
+def delete_user(user_id):
+    """Delete a user from the system"""
+    user = User.query.get_or_404(user_id)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect("/")
+
 ######################################################
 # Droplist routes
-@app.route("/droplist/new", methods=["GET", "POST"])
+@app.route("/droplists")
+@authorize
+def droplist_index():
+    """show all the users droplist"""
+
+    droplists = None
+
+    if g.user.current_role.role == "stocker":
+        droplists = g.user.get_stocker.drop_list
+    elif g.user.current_role.role == "forklift_driver":
+        droplists = g.user.get_driver.drop_list
+
+
+    return render_template("/droplists/index.html", droplists = droplists)
+
+
+@app.route("/droplists/new", methods=["GET", "POST"])
 @authorize
 def create_droplist():
     """create a new droplist"""
-    form = DropListForm()
-
-    form.set_choices(db, ForkliftDriver, User)
+    form = CreateDropListForm(department = g.user.department)
 
     if form.validate_on_submit():
-        drop_list = DropList(stocker_id=g.user.stocker.id, notes=form.notes.data, forklift_driver_id = form.forklift_driver_id.data)
-        db.session.add(drop_list)
+        droplist = DropList(stocker_id=g.user.get_stocker.id, department=form.department.data, description=form.description.data)
+        db.session.add(droplist)
         db.session.commit()
         
         flash("Droplist successfully created")
-        return redirect(f"/droplist/{drop_list.id}")
+        return redirect(f"/droplists/{droplist.id}")
     
     return render_template("droplists/form.html", form=form)
 
 
-@app.route("/droplist/<int:drop_list_id>")
+@app.route("/droplists/<int:droplist_id>")
 @authorize
-def show_drop_list(drop_list_id):
-    drop_list = DropList.query.get_or_404(drop_list_id)
+def show_drop_list(droplist_id):
+    droplist = DropList.query.get_or_404(droplist_id)
 
-    return render_template("droplists/show.html", drop_list=drop_list)
+    return render_template("droplists/show.html", droplist=droplist)
 
 @app.route("/droplist/<int:droplist_id>/edit", methods=["GET", "POST"])
 @authorize

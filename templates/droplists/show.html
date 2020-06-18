@@ -1,6 +1,7 @@
-{%extends "base.html"%}{%block content%} {{drop_list.notes}}
+{%extends "base.html"%}{%block content%} {{droplist.description}}
+{{droplist.department}} {{droplist.timestamp}} {{droplist.status}}
 <div>
-  {%if drop_list.items%} {%for item in drop_list.items%}
+  {%if droplist.items%} {%for item in droplist.items%}
   <div>
     {{item.description}}
   </div>

@@ -1,13 +1,13 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField, IntegerField
-from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange
+from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange, DataRequired
 
 class SignUpForm(FlaskForm):
     """Form that signup users"""
 
-    first_name = StringField("First Name", validators=[InputRequired()])
+    first_name = StringField("Firstname", validators=[DataRequired(message="Firstname cannot be blank")])
     
-    last_name = StringField("Last Name", validators=[InputRequired()])
+    last_name = StringField("Lastname", validators=[DataRequired(message="Lastname cannot be blank")])
     
     email = StringField("E-Mail", validators=[InputRequired(), Email()])
 
@@ -35,9 +35,12 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
 
-class DropListForm(FlaskForm):
-    notes = TextAreaField("Notes", validators=[Optional(), Length(max=200)])
-    forklift_driver_id = SelectField("Forklift Driver", validators=[Optional()], coerce=int)
+class CreateDropListForm(FlaskForm):
+    description = StringField("Description", validators=[DataRequired(message="Description cannot be blank"), Length(min=3, max=100)])
+
+    department = SelectField("Department", validators=[InputRequired()], choices=[("hardlines", "Hardlines"), ("freezer", "Freezer"), 
+                                            ("receiving", "Receiving"), ("sundries","Sundries")], coerce=str)
+    # forklift_driver_id = SelectField("Forklift Driver", validators=[Optional()], coerce=int)
 
     def set_choices(self, db, ForkliftDriver, User):
         self.forklift_driver_id.choices = db.session.query(

@@ -37,7 +37,7 @@ class User(db.Model):
 
     password = db.Column(db.Text,nullable=False)
 
-    current_role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
+    current_role_id = db.Column(db.Integer, db.ForeignKey("roles.id", ondelete="SET NULL"), nullable=False)
 
     image_url = db.Column(
         db.Text,
@@ -161,7 +161,14 @@ class DropList(db.Model):
 
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
 
-    # items = db.relationship("Item", cascade="all,delete", backref="droplist")
+    status = db.Column(db.Text, nullable=False, default="not sent")
+
+    description = db.Column(db.Text, nullable=False, default=f"My Drop List-{datetime.utcnow}")
+
+    @property
+    def droplist_items(self):
+        items = db.session.query(Item).join(DropList, Item.droplist_id==DropList.id).filter(DropList.id==self.id).all()
+        return items
 
 class Location(db.Model):
     """A place where items are located"""

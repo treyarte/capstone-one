@@ -1,0 +1,21 @@
+{%extends "base.html"%}{%block content%} {%if droplists%} {%for droplist in
+droplists%}
+<div>
+  <ul>
+    <li>
+      {{droplist.status}}
+    </li>
+    <li>
+      {{droplist.description}}
+    </li>
+    <li>
+      {{droplist.department}}
+    </li>
+    <li>
+      {{droplist.timestamp}}
+    </li>
+  </ul>
+</div>
+{%endfor%} {%else%}
+<p>Nothing to see here but us stockers</p>
+{%endif%} {%endblock%}
