@@ -12,7 +12,7 @@ from app import app
 
 app.config["SQLALCHEMY_ECHO"] = False
 
-db.session.rollback()
+
 db.create_all()
 
 
@@ -23,9 +23,9 @@ class UserModelTestCase(TestCase):
         """create sample data"""
         db.session.rollback()
 
+        User.query.delete()
         Stocker.query.delete()
         ForkliftDriver.query.delete()
-        User.query.delete()
         Role.query.delete()
 
         role1 = Role(role="stocker")
@@ -61,6 +61,10 @@ class UserModelTestCase(TestCase):
     def tearDown(self):
         """rollback db transactions"""
         db.session.rollback()
+        User.query.delete()
+        Stocker.query.delete()
+        ForkliftDriver.query.delete()
+        Role.query.delete()
     
     def test_user_sign_up(self):
         """Should return the newly created user"""

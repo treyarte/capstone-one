@@ -11,8 +11,8 @@ class SignUpForm(FlaskForm):
     
     email = StringField("E-Mail", validators=[InputRequired(), Email()])
 
-    department = SelectField("Department", validators=[InputRequired()], choices=[("Hardlines", "hardlines"), ("Freeze", "freezer"), 
-                                            ("Receiving", "receiving"), ("Sundries","sundries")])
+    department = SelectField("Department", validators=[InputRequired()], choices=[("hardlines", "Hardlines"), ("freezer", "Freezer"), 
+                                            ("receiving", "Receiving"), ("sundries","Sundries")])
 
     password = PasswordField("Password", validators=[InputRequired(), EqualTo("confirm", message="Passwords must match"), 
                                         Regexp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
@@ -27,7 +27,9 @@ class SignUpForm(FlaskForm):
 
     image_url = StringField("Image", validators=[Optional()])
 
-    user_type = RadioField("Are you a...", validators=[InputRequired()], choices=[("Stocker", "stocker"), ("Forklift Driver", "driver")])
+    user_role = SelectField("Role", validators=[InputRequired()], coerce=int)
+
+    # user_type = RadioField("Are you a...", validators=[InputRequired()], choices=[("Stocker", "stocker"), ("Forklift Driver", "driver")])
 class LoginForm(FlaskForm):
     """Form for authenticating a user"""
     email = StringField("Email", validators=[InputRequired()])

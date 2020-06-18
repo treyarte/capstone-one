@@ -22,7 +22,7 @@ class DropListModelTestCase(TestCase):
     def setUp(self):
         """Adding sample data"""
 
-        for model in [DropList,Item, Location, Stocker, ForkliftDriver, User]:
+        for model in [DropList,Item, Location, Stocker, ForkliftDriver, User, Role]:
             model.query.delete()
 
         self.client = app.test_client()
@@ -39,6 +39,8 @@ class DropListModelTestCase(TestCase):
     def tearDown(self):
         """Rolling back any bad transactions"""
         db.session.rollback()
+        for model in [DropList,Item, Location, Stocker, ForkliftDriver, User, Role]:
+            model.query.delete()
         
     def test_droplist_creation(self):
         """Testing if request can be created"""

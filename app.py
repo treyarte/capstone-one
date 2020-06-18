@@ -46,7 +46,7 @@ def authorize(func):
     # inner_function.__name__ = func.__name__
     return inner_function
 
-def check_owner(func):
+def check_droplist_owner(func):
     """decorator that check if a user is the owner of a droplist"""
     @wraps(func)
     def inner_function(droplist_id, *args,**kwargs):
@@ -57,7 +57,20 @@ def check_owner(func):
             return redirect("/")
         return func(droplist_id, *args,**kwargs)
     return inner_function
-    
+
+def check_same_user(func):
+    """check if the logged in user is the same user"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        u_id = kwargs.get("user_id")
+     
+        u = User.query.get_or_404(u_id)
+
+        if g.user.id != u.id:
+            flash("Unauthorized access")
+            return redirect("/")
+        return func(*args, **kwargs)
+    return inner_function
 
 def handle_login(user):
     """Log a user in"""
@@ -93,6 +106,8 @@ def signUp():
     """Signs a user up to the system"""
     form = SignUpForm()
 
+    form.user_role.choices = db.session.query(Role.id, Role.role).all()
+
     if form.validate_on_submit():
         try:
             user = User.sign_up(
@@ -101,16 +116,17 @@ def signUp():
                 email = form.email.data,
                 department = form.department.data,
                 password = form.password.data,
-                image_url = form.image_url.data
+                image_url = form.image_url.data,
+                current_role_id = form.user_role.data
             )
             
             db.session.commit()
         
-            if form.user_type.data == "stocker":
+            if user.current_role.role == "stocker":
                 stocker = Stocker(user_id = user.id)
                 db.session.add(stocker)
                 db.session.commit()
-            elif form.user_type.data == "driver":
+            elif user.current_role.role == "forklift_driver":
                 driver = ForkliftDriver(user_id = user.id)
                 db.session.add(stocker)
                 db.session.commit()
@@ -121,6 +137,7 @@ def signUp():
         
         handle_login(user)
 
+        flash(f"Welcome {user.first_name}!")
         return redirect("/")
     
     return render_template("users/signup.html", form=form)
@@ -152,6 +169,40 @@ def logout():
     flash("Successfully logged out", "success")
     return redirect("/")
 
+@app.route("/users")
+def get_users():
+    """get users in the system"""
+
+    users = User.query.all()
+    return render_template("/users/index.html", users=users)
+
+@app.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@authorize
+@check_same_user
+def edit_user(user_id):
+    """edit user information"""
+
+    user = User.query.get_or_404(user_id)
+
+    form = SignUpForm(obj=user)
+
+    form.user_role.choices = db.session.query(Role.id, Role.role).all()
+
+    if form.validate_on_submit():
+        user.first_name=form.first_name.data
+        user.last_name=form.last_name.data
+        user.email = form.email.data
+        user.department = form.department.data
+        user.password = form.password.data
+        user.image_url = form.image_url.data
+        user.current_role_id = form.user_role.data
+        db.session.commit()
+
+        flash("Profile successfully updated")
+        return redirect("/")
+    
+    return render_template("/users/edit.html", form=form)
+
 ######################################################
 # Droplist routes
 @app.route("/droplist/new", methods=["GET", "POST"])
@@ -182,7 +233,7 @@ def show_drop_list(drop_list_id):
 
 @app.route("/droplist/<int:droplist_id>/edit", methods=["GET", "POST"])
 @authorize
-@check_owner
+@check_droplist_owner
 def edit_drop_list(droplist_id):
     """Allow the user to edit their drop list"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -204,7 +255,7 @@ def edit_drop_list(droplist_id):
 
 @app.route("/droplist/<int:droplist_id>/delete")
 @authorize
-@check_owner
+@check_droplist_owner
 def delete_droplist(droplist_id):
     """Delete a droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -228,7 +279,7 @@ def show_droplist_items(droplist_id):
 
 @app.route("/droplist/<int:droplist_id>/items/add", methods=["GET","POST"])
 @authorize
-@check_owner
+@check_droplist_owner
 def add_item_to_drop_list(droplist_id):
     """Add an item to the drop list"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -270,7 +321,7 @@ def show_item(droplist_id,item_id):
 
 @app.route("/droplist/<int:droplist_id>/items/<int:item_id>/edit", methods=["GET", "POST"])
 @authorize
-@check_owner
+@check_droplist_owner
 def edit_droplist_item(droplist_id, item_id):
     """edit a droplist item"""
     droplist, item = check_item_in_droplist(droplist_id, item_id)
@@ -298,7 +349,7 @@ def edit_droplist_item(droplist_id, item_id):
 
 @app.route("/droplist/<int:droplist_id>/items/<int:item_id>/delete")
 @authorize
-@check_owner
+@check_droplist_owner
 def delete_droplist_item(droplist_id, item_id):
     """delete an item from a droplist"""
     droplist, item = check_item_in_droplist(droplist_id, item_id)

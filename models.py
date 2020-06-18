@@ -45,10 +45,6 @@ class User(db.Model):
         default="https://pixabay.com/get/57e5d2444352a514f6da8c7dda35367b1c3edae25751734a_1280.png"
     )
 
-    forklift_driver = db.relationship("ForkliftDriver", backref="user", uselist=False)
-    stocker = db.relationship("Stocker", backref="user", uselist=False)
-    
-
     @property
     def get_stocker(self):
         stocker = db.session.query(Stocker).join(
@@ -119,13 +115,13 @@ class ForkliftDriver(db.Model):
 
     user_id = db.Column(
         db.Integer, 
-        db.ForeignKey("users.id"),
+        db.ForeignKey("users.id",ondelete="CASCADE"),
         unique=True,
         nullable=False
     )
 
     drop_list = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="all, delete"))
-
+    user = db.relationship("User", backref=db.backref("forklift_driver", cascade="all, delete"), uselist=False)
 
 class Stocker(db.Model):
     """A user that makes a drop list"""
@@ -139,12 +135,13 @@ class Stocker(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey("users.id"),
+        db.ForeignKey("users.id",  ondelete="CASCADE"),
         unique=True,
         nullable=False
     )
 
     drop_list = db.relationship("DropList", backref=db.backref("stocker", cascade="all, delete"))
+    user = db.relationship("User", backref=db.backref("stocker", cascade="all, delete"), uselist=False)
 
 
 class DropList(db.Model):
