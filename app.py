@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, CreateDropListForm
+from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
 from functools import wraps
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def authorize(func):
     @wraps(func)
     def inner_function(*args, **kwargs):
         if not g.user:
-            flash("Unauthorized Access", "danger")
+            flash("Please login to continue", "danger")
             return redirect("/")
         return func(*args, **kwargs)
     #either use wraps or below to prevent overwritting of endpoints
@@ -49,13 +49,14 @@ def authorize(func):
 def check_droplist_owner(func):
     """decorator that check if a user is the owner of a droplist"""
     @wraps(func)
-    def inner_function(droplist_id, *args,**kwargs):
-        drop_list = DropList.query.get_or_404(droplist_id)
+    def inner_function(*args,**kwargs):
+        droplist_id  = kwargs.get("droplist_id")
+        droplist = DropList.query.get_or_404(droplist_id)
 
-        if g.user.stocker.id != drop_list.stocker_id:
-            flash("Unauthorized access")
+        if g.user.get_stocker.id != droplist.stocker_id: 
+            flash("Unauthorized access", "danger")
             return redirect("/")
-        return func(droplist_id, *args,**kwargs)
+        return func(*args,**kwargs)
     return inner_function
 
 def check_same_user(func):
@@ -67,7 +68,35 @@ def check_same_user(func):
         u = User.query.get_or_404(u_id)
 
         if g.user.id != u.id:
-            flash("Unauthorized access")
+            flash("Unauthorized access", "danger")
+            return redirect("/")
+        return func(*args, **kwargs)
+    return inner_function
+
+def check_droplist_access(func):
+    """check if the current user have access to view the droplist"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        droplist = DropList.query.get_or_404(kwargs.get("droplist_id"))
+        if g.user.current_role.role == "stocker":
+            if droplist.stocker.user_id != g.user.id:
+                flash("Unauthorized access", "danger")
+                return redirect("/droplists")
+
+        elif g.user.current_role.role == "forklift_driver":
+            if droplist.forklift_driver.user_id != g.user.id:
+                flash("Unauthorized access", "danger")
+                return redirect("/droplists")
+
+        return func(*args, **kwargs)
+    return inner_function
+
+def check_stocker(func):
+    """check if the current logged in user is a stocker"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        if g.user.current_role.role != "stocker":
+            flash("Only stockers can perform that action. Please change role in settings", "warning")
             return redirect("/")
         return func(*args, **kwargs)
     return inner_function
@@ -235,9 +264,11 @@ def droplist_index():
 
 @app.route("/droplists/new", methods=["GET", "POST"])
 @authorize
+@check_stocker
 def create_droplist():
     """create a new droplist"""
-    form = CreateDropListForm(department = g.user.department)
+
+    form = DropListForm(department = g.user.department)
 
     if form.validate_on_submit():
         droplist = DropList(stocker_id=g.user.get_stocker.id, department=form.department.data, description=form.description.data)
@@ -252,13 +283,15 @@ def create_droplist():
 
 @app.route("/droplists/<int:droplist_id>")
 @authorize
+@check_droplist_access
 def show_drop_list(droplist_id):
     droplist = DropList.query.get_or_404(droplist_id)
 
     return render_template("droplists/show.html", droplist=droplist)
 
-@app.route("/droplist/<int:droplist_id>/edit", methods=["GET", "POST"])
+@app.route("/droplists/<int:droplist_id>/edit", methods=["GET", "POST"])
 @authorize
+@check_stocker
 @check_droplist_owner
 def edit_drop_list(droplist_id):
     """Allow the user to edit their drop list"""
@@ -266,21 +299,20 @@ def edit_drop_list(droplist_id):
     
     form = DropListForm(obj=droplist)
 
-    form.set_choices(db, ForkliftDriver, User)
-
     if form.validate_on_submit():
-        droplist.notes = form.notes.data
-        droplist.forklift_driver_id = form.forklift_driver_id.data
+        droplist.description = form.description.data
+        droplist.department = form.department.data
 
         db.session.commit()
 
-        flash("Drop list successfully updated")
-        return redirect(f"/droplist/{droplist_id}")
+        flash("Drop list successfully updated", "success")
+        return redirect(f"/droplists/{droplist_id}")
     
     return render_template("/droplists/edit.html", form=form)
 
-@app.route("/droplist/<int:droplist_id>/delete")
+@app.route("/droplists/<int:droplist_id>/delete", methods=["POST"])
 @authorize
+@check_stocker
 @check_droplist_owner
 def delete_droplist(droplist_id):
     """Delete a droplist"""

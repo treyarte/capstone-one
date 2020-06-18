@@ -37,7 +37,7 @@ class UserRoutesTestCase(TestCase):
         self.role2 = role2
 
         self.u1 = User.sign_up(
-                            first_name="Test", last_name="Person", 
+                            first_name="Test", last_name="User", 
                             email="test@person.com", department="sundrys", 
                             password="Qwerty123!", current_role_id=self.role1.id)
 
@@ -90,7 +90,7 @@ class UserRoutesTestCase(TestCase):
                             "password":"Qwerty123!", "confirm": "Qwerty123!", "user_role":self.role_id})
 
             self.assertEqual(resp.status_code, 302)
-            user = User.query.filter(User.last_name=="Person").first()
+            user = User.query.filter(User.first_name=="Test").first()
             self.assertEqual(user.email, "person@test.net")
         
     def test_wrong_user_edit(self):

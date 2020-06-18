@@ -7,4 +7,7 @@
   </div>
   {%endfor%} {%endif%}
 </div>
+<form action="/droplists/{{droplist.id}}/delete" method="post">
+  <button type="submit">Delete</button>
+</form>
 {%endblock%}

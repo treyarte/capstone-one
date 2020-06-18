@@ -35,7 +35,7 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
 
-class CreateDropListForm(FlaskForm):
+class DropListForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired(message="Description cannot be blank"), Length(min=3, max=100)])
 
     department = SelectField("Department", validators=[InputRequired()], choices=[("hardlines", "Hardlines"), ("freezer", "Freezer"), 

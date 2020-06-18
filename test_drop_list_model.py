@@ -14,6 +14,7 @@ app.config["SQLALCHEMY_ECHO"] = False
 
 from utils import create_sample_data
 
+db.drop_all()
 db.create_all()
 
 class DropListModelTestCase(TestCase):
@@ -24,7 +25,7 @@ class DropListModelTestCase(TestCase):
 
         for model in [DropList,Item, Location, Stocker, ForkliftDriver, User, Role]:
             model.query.delete()
-
+        
         self.client = app.test_client()
 
         #destructing off the values we need and skipping the ones we don't 
@@ -41,7 +42,8 @@ class DropListModelTestCase(TestCase):
         db.session.rollback()
         for model in [DropList,Item, Location, Stocker, ForkliftDriver, User, Role]:
             model.query.delete()
-        
+
+
     def test_droplist_creation(self):
         """Testing if request can be created"""
         test_droplist = DropList(stocker_id=self.s1.id, forklift_driver_id=self.d1.id, department=self.s1.user.department)

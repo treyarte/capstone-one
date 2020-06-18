@@ -120,7 +120,7 @@ class ForkliftDriver(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="all, delete"))
+    drop_list = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="delete"))
     user = db.relationship("User", backref=db.backref("forklift_driver", cascade="all, delete"), uselist=False)
 
 class Stocker(db.Model):
@@ -140,8 +140,8 @@ class Stocker(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref=db.backref("stocker", cascade="all, delete"))
-    user = db.relationship("User", backref=db.backref("stocker", cascade="all, delete"), uselist=False)
+    drop_list = db.relationship("DropList", backref=db.backref("stocker"))
+    user = db.relationship("User", backref=db.backref("stocker"), uselist=False)
 
 
 class DropList(db.Model):
@@ -163,7 +163,7 @@ class DropList(db.Model):
 
     status = db.Column(db.Text, nullable=False, default="not sent")
 
-    description = db.Column(db.Text, nullable=False, default=f"My Drop List-{datetime.utcnow}")
+    description = db.Column(db.Text, nullable=False, default=f"My Drop List-{datetime.utcnow()}")
 
     @property
     def droplist_items(self):
