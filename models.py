@@ -169,6 +169,14 @@ class DropList(db.Model):
     def droplist_items(self):
         items = db.session.query(Item).join(DropList, Item.droplist_id==DropList.id).filter(DropList.id==self.id).all()
         return items
+    
+    def check_item(self, item):
+        """Check if an item is in the droplist"""
+        if item in self.droplist_items:
+            return True
+        else:
+            return False
+        
 
 class Location(db.Model):
     """A place where items are located"""

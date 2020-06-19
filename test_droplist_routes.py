@@ -3,6 +3,7 @@
 import os
 from unittest import TestCase
 from models import Role, User, Stocker, ForkliftDriver, DropList, db
+from test_utils import droplist_setup
 
 os.environ["DATABASE_URL"] = "postgresql:///mydroplist-test"
 
@@ -20,55 +21,18 @@ class DroplistTestCase(TestCase):
     def setUp(self):
         """create a test client and sample data"""
 
-        User.query.delete()
-        ForkliftDriver.query.delete()
-        Stocker.query.delete()
-        Role.query.delete()
-        DropList.query.delete()
-        
         self.client = app.test_client()
 
-        role1 = Role(role="stocker")
-        role2 = Role(role="forklift_driver")
+        u1, u2, u3, s1, s2, f1, droplist = droplist_setup()
 
-        db.session.add_all([role1, role2])
-        db.session.commit()
-
-        self.role1 = role1
-        self.role2 = role2
-
-        self.u1 = User.sign_up(
-                            first_name="Test", last_name="Person", 
-                            email="test@person.com", department="sundrys", 
-                            password="Qwerty123!", current_role_id=self.role1.id)
-
-        self.u2 = User.sign_up(
-                            first_name="New", last_name="Person", 
-                            email="new@person.com", department="sundrys", 
-                            password="Qwerty123!", current_role_id=self.role2.id)
-
-        self.u3 = User.sign_up(
-                            first_name="New2", last_name="Person2", 
-                            email="new@person2.com", department="hardlines", 
-                            password="Qwerty123!", current_role_id=self.role1.id)
-
-        db.session.commit()
-
-        stocker = Stocker(user_id=self.u1.id)
-        stocker2 = Stocker(user_id=self.u3.id)
-        forklift_driver = ForkliftDriver(user_id=self.u2.id)
-
-        db.session.add_all([stocker,stocker2, forklift_driver])
-        db.session.commit()
-
-        self.s1 = stocker
-        self.f1 = forklift_driver
-
-        droplist = DropList(stocker_id=self.s1.id, description="Test Drop", department="hardlines", forklift_driver_id=self.f1.id)
-        db.session.add(droplist)
-        db.session.commit()
-
+        self.u1 = u1
+        self.u2 = u2
+        self.u3 = u3
+        self.s1 = s1
+        self.s2 = s2
+        self.f1 = f1
         self.droplist = droplist
+       
 
     
     def tearDown(self):

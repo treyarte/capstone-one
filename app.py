@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, render_template, flash, session, g
+from flask import Flask, redirect, render_template, flash, session, g, Response
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
@@ -109,19 +109,6 @@ def handle_logout():
     """Remove the user from the session to log them out"""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
-
-def check_item_in_droplist(droplist_id, item_id):
-    """check if an item is in the specified droplist"""
-    droplist = DropList.query.get_or_404(droplist_id)
-    #checking to see if the item even exists
-    Item.query.get_or_404(item_id)
-
-    item = db.session.query(Item).join(
-                                DropListItem, Item.id==DropListItem.item_id).join(
-                                DropList, DropList.id == DropListItem.drop_list_id).filter(
-                                Item.id==item_id).filter(DropList.id==droplist_id).first()
-
-    return [droplist, item]
 
 @app.route("/")
 def homepage():
@@ -327,16 +314,18 @@ def delete_droplist(droplist_id):
 #####################################################
 # Droplist items routes
 
-@app.route("/droplist/<int:droplist_id>/items")
+@app.route("/droplists/<int:droplist_id>/items")
 @authorize
+@check_droplist_access
 def show_droplist_items(droplist_id):
     """Show items that are in the droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
 
     return render_template("/droplist_items/index.html", droplist=droplist)
 
-@app.route("/droplist/<int:droplist_id>/items/add", methods=["GET","POST"])
+@app.route("/droplists/<int:droplist_id>/items/add", methods=["GET","POST"])
 @authorize
+@check_stocker
 @check_droplist_owner
 def add_item_to_drop_list(droplist_id):
     """Add an item to the drop list"""
@@ -351,42 +340,41 @@ def add_item_to_drop_list(droplist_id):
                 row_letter=form.row_letter.data,
                 column_number=form.column_number.data,
                 location_id=form.location_id.data,
-                description=form.description.data
+                description=form.description.data,
+                droplist_id=droplist.id
         )
 
         db.session.add(item)
         db.session.commit()
 
-        droplist.items.append(item)
-
-        db.session.commit()
-
-        return redirect(f"/droplist/{droplist.id}")
+        return redirect(f"/droplists/{droplist.id}/items")
 
     return render_template("/droplist_items/new.html", form=form)
 
-@app.route("/droplist/<int:droplist_id>/items/<int:item_id>")
+@app.route("/droplists/<int:droplist_id>/items/<int:item_id>")
 @authorize
+@check_droplist_access
 def show_item(droplist_id,item_id):
     """show a specific item in a droplist"""
-    droplist, item = check_item_in_droplist(droplist_id, item_id)
+    droplist = DropList.query.get_or_404(droplist_id)
+    item = Item.query.get_or_404(item_id)
 
-    if item == None:
-        #for now
-        return redirect(404)
+    if droplist.check_item(item) == False:
+        return render_template("404.html"), 404
 
-    return render_template("/droplist_items/show.html", item=item)
+    return render_template("/droplist_items/show.html", item=item, droplist = droplist)
 
-@app.route("/droplist/<int:droplist_id>/items/<int:item_id>/edit", methods=["GET", "POST"])
+@app.route("/droplists/<int:droplist_id>/items/<int:item_id>/edit", methods=["GET", "POST"])
 @authorize
+@check_stocker
 @check_droplist_owner
 def edit_droplist_item(droplist_id, item_id):
     """edit a droplist item"""
-    droplist, item = check_item_in_droplist(droplist_id, item_id)
+    droplist = DropList.query.get_or_404(droplist_id)
+    item = Item.query.get_or_404(item_id)
 
-    if item == None:
-        #for now
-        return redirect(404)
+    if droplist.check_item(item) == False:
+        return render_template("404.html"), 404
 
     form = ItemForm(obj=item)
 
@@ -401,26 +389,27 @@ def edit_droplist_item(droplist_id, item_id):
         db.session.commit()
 
         flash("Item successfully updated")
-        return redirect(f"/droplist/{droplist_id}/items/{item_id}")
+        return redirect(f"/droplists/{droplist_id}/items/{item_id}")
 
     return render_template("/droplist_items/edit.html", form=form)
 
-@app.route("/droplist/<int:droplist_id>/items/<int:item_id>/delete")
+@app.route("/droplists/<int:droplist_id>/items/<int:item_id>/delete", methods=["POST"])
 @authorize
+@check_stocker
 @check_droplist_owner
 def delete_droplist_item(droplist_id, item_id):
     """delete an item from a droplist"""
-    droplist, item = check_item_in_droplist(droplist_id, item_id)
+    droplist = DropList.query.get_or_404(droplist_id)
+    item = Item.query.get_or_404(item_id)
 
-    if item == None:
-        #for now
-        return redirect(404)
+    if droplist.check_item(item) == False:
+        return render_template("404.html"), 404
     
     db.session.delete(item)
     db.session.commit()
 
     flash("successfully deleted the item", "success")
-    return redirect(f"/droplist/{droplist.id}/items")
+    return redirect(f"/droplists/{droplist.id}/items")
 
 
 
@@ -478,6 +467,12 @@ def delete_location(location_id):
     flash("Location successfully deleted")
     return redirect("/")
 
+#################################################
+#error routes
+@app.errorhandler(404)
+def not_found(e):
+
+    return render_template("404.html"), 404
 
 
 # @app.after_request

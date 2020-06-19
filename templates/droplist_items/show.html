@@ -2,4 +2,10 @@
 <div>
   {{item.row_letter}}{{item.column_number}} {{item.description}}
 </div>
+<form
+  action="/droplists/{{droplist.id}}/items/{{item.id}}/delete"
+  method="post"
+>
+  <button type="submit">Delete</button>
+</form>
 {%endblock%}

@@ -53,7 +53,7 @@ class LocationForm(FlaskForm):
 
 class ItemForm(FlaskForm):
     """Form for items"""
-    row_letter = SelectField("Row", validators=[InputRequired()], choices=[("A", "a"), ("B", "b"), ("C", "c")])
+    row_letter = SelectField("Row", validators=[InputRequired()], choices=[("a", "A"), ("b", "B"), ("c", "C")])
     column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
     description = StringField("Description")
     location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
