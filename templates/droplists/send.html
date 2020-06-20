@@ -1,0 +1,25 @@
+{%extends "base.html"%}{%block content%} {%if drivers%} {%for driver in
+drivers%}
+<div>
+  <div>{{driver.user.first_name}} {{driver.user.last_name}}</div>
+  <div><span>{{driver.user.department}}</span></div>
+  {%if driver.id != droplist.forklift_driver_id or droplist.status != "sent" and
+  droplist.status != "accepted"%}
+  <div>
+    <form action="/droplists/{{droplist.id}}/send" method="post">
+      <input
+        type="hidden"
+        name="driverId"
+        id="driverId"
+        value="{{driver.id}}"
+      />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  {%else%}
+  <button disabled="disabled">Sent</button>
+  {%endif%}
+</div>
+{%endfor%} {%else%}
+<div>No drivers available</div>
+{%endif%} {%endblock%}

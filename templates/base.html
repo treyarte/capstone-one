@@ -6,11 +6,15 @@
     <title>Document</title>
   </head>
   <body>
+    {%if g.user%}
     <form action="/logout" method="post">
       <button type="submit">Log out</button>
     </form>
-    {%with messages = get_flashed_messages(with_categories=true)%} {%if
-    messages%}
+    {%else%}
+    <li><a href="/login">Login</a></li>
+    <li><a href="/sign-up">Sign Up</a></li>
+    {%endif%} {%with messages = get_flashed_messages(with_categories=true)%}
+    {%if messages%}
     <div class="container">
       {%for category, msg in messages%}
       <div class="alert alert-{{category}}">{{msg}}</div>

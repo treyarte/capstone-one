@@ -120,9 +120,32 @@ class ForkliftDriver(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="delete"))
+    droplists = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="delete"))
     user = db.relationship("User", backref=db.backref("forklift_driver", cascade="all, delete"), uselist=False)
 
+    def get_droplists_by_department(self, department):
+        if department == "all":
+            droplists = db.session.query(DropList).join(
+                ForkliftDriver, ForkliftDriver.id == DropList.forklift_driver_id).filter(
+                    ForkliftDriver.id==self.id)
+        else:
+            droplists = db.session.query(DropList).join(
+                            ForkliftDriver, ForkliftDriver.id == DropList.forklift_driver_id).filter(
+                                DropList.department == department).filter(
+                                    ForkliftDriver.id==self.id)
+        return droplists
+
+    @classmethod
+    def get_drivers_by_department(cls, department):
+        if department != "all":
+            forklift_drivers = db.session.query(ForkliftDriver).join(
+                User, User.id == ForkliftDriver.user_id).filter(
+                    User.department==department).all()
+        else:
+            forklift_drivers = db.session.query(ForkliftDriver).join(
+                User, User.id == ForkliftDriver.user_id).all()
+        
+        return forklift_drivers
 class Stocker(db.Model):
     """A user that makes a drop list"""
 
@@ -140,10 +163,16 @@ class Stocker(db.Model):
         nullable=False
     )
 
-    drop_list = db.relationship("DropList", backref=db.backref("stocker"))
+    droplists = db.relationship("DropList", backref=db.backref("stocker"))
     user = db.relationship("User", backref=db.backref("stocker"), uselist=False)
 
-
+    def get_droplists_by_department(self, department):
+        if department == "all":
+            droplists = db.session.query(DropList).join(Stocker, Stocker.id == DropList.stocker_id).filter(Stocker.id==self.id)
+        else:
+            droplists = db.session.query(DropList).join(
+                            Stocker, Stocker.id == DropList.stocker_id).filter(DropList.department == department).filter(Stocker.id==self.id)
+        return droplists
 class DropList(db.Model):
     """A droplist created by a stocker and sent to a driver"""
 

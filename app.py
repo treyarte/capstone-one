@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, render_template, flash, session, g, Response
+from flask import Flask, redirect, render_template, flash, session, g, Response, request
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
@@ -96,7 +96,17 @@ def check_stocker(func):
     @wraps(func)
     def inner_function(*args, **kwargs):
         if g.user.current_role.role != "stocker":
-            flash("Only stockers can perform that action. Please change role in settings", "warning")
+            flash("Only stockers can perform this action. Please change role in settings", "warning")
+            return redirect("/")
+        return func(*args, **kwargs)
+    return inner_function
+
+def check_driver(func):
+    """check if the current logged in user is a driver"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        if g.user.current_role.role != "forklift_driver":
+            flash("Only drivers can perform this action. Please change role in settings", "warning")
             return redirect("/")
         return func(*args, **kwargs)
     return inner_function
@@ -144,7 +154,7 @@ def signUp():
                 db.session.commit()
             elif user.current_role.role == "forklift_driver":
                 driver = ForkliftDriver(user_id = user.id)
-                db.session.add(stocker)
+                db.session.add(driver)
                 db.session.commit()
 
         except IntegrityError:
@@ -240,10 +250,12 @@ def droplist_index():
 
     droplists = None
 
+    department_filter = request.args.get("department",g.user.department)
+
     if g.user.current_role.role == "stocker":
-        droplists = g.user.get_stocker.drop_list
+        droplists = g.user.get_stocker.get_droplists_by_department(department_filter)
     elif g.user.current_role.role == "forklift_driver":
-        droplists = g.user.get_driver.drop_list
+        droplists = g.user.get_driver.droplists
 
 
     return render_template("/droplists/index.html", droplists = droplists)
@@ -275,6 +287,58 @@ def show_drop_list(droplist_id):
     droplist = DropList.query.get_or_404(droplist_id)
 
     return render_template("droplists/show.html", droplist=droplist)
+
+@app.route("/droplists/<int:droplist_id>/send", methods=["GET", "POST"])
+@authorize
+@check_stocker
+@check_droplist_owner
+def send_droplist(droplist_id):
+    """connects a droplist to a driver"""
+    droplist = DropList.query.get_or_404(droplist_id)
+    forklift_driver_id = request.form.get("driverId", type=int)
+    
+    department = request.args.get("department", droplist.department)
+    
+    if forklift_driver_id:
+        forklift_driver = ForkliftDriver.query.get_or_404(forklift_driver_id)
+        
+        droplist.forklift_driver_id = forklift_driver.id
+        droplist.status="sent"    
+
+        db.session.commit()
+
+        flash("Droplist successfully sent")
+        return redirect("/droplists")
+    
+
+
+    forklift_drivers = ForkliftDriver.get_drivers_by_department(department)
+
+    return render_template("/droplists/send.html", drivers=forklift_drivers, droplist=droplist)
+
+@app.route("/droplists/<int:droplist_id>/option", methods=["POST"])
+@authorize
+@check_driver
+@check_droplist_access
+def droplist_accept_decline(droplist_id):
+    """driver accepts or declines a droplist"""
+    droplist = DropList.query.get_or_404(droplist_id)
+    
+    choice = request.form.get("choice")
+    print("////////////////////////")
+    print(choice)
+    if choice == "accepted" or choice == "declined":
+        droplist.status = choice
+        db.session.commit()
+
+        flash(f"Successfully {choice} droplist", "success")
+        return redirect("/droplists")
+    
+    else:
+        flash("Not a valid choice", "danger")
+        return redirect("/droplists")
+    
+    
 
 @app.route("/droplists/<int:droplist_id>/edit", methods=["GET", "POST"])
 @authorize
