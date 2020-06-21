@@ -112,7 +112,11 @@ class ForkliftDriver(db.Model):
 
     @property
     def full_name(self):
-        full_name = db.session.query(User.first_name, User.last_name).join(ForkliftDriver, User.id == ForkliftDriver.user_id).first()
+        full_name = db.session.query(
+            User.first_name, User.last_name).join(
+                ForkliftDriver, User.id == ForkliftDriver.user_id).filter(
+                    ForkliftDriver.id == self.id
+                ).first()
         return " ".join(full_name)
 
     __tablename__ = "forklift_drivers"

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, render_template, flash, session, g, Response, request
+from flask import Flask, redirect, render_template, flash, session, g, Response, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
@@ -569,12 +569,27 @@ def get_all_accepted_drivers_droplist():
 
     drivers_names = [d.full_name for d in all_drivers]
 
+    num_droplists = []
+
+    for driver in all_drivers:
+        droplist_count = db.session.query(DropList).join(
+            ForkliftDriver, ForkliftDriver.id == DropList.forklift_driver_id).filter(DropList.status==complete_filter).filter(
+                ForkliftDriver.id == driver.id).count()
+        num_droplists.append(droplist_count)
+
     chart_dict = {
-        type: chart_type,
+        "type": chart_type,
         "data": {
-            "labels": 
+            "labels": drivers_names,
+            "datasets":[{
+                "label": "Forklift Drivers",
+                "data": num_droplists
+            
+            }]
         }
     }
+
+    return jsonify(chart_dict)
 
 
 
