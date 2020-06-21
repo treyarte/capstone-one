@@ -3,7 +3,7 @@ from flask import Flask, redirect, render_template, flash, session, g, Response,
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
 from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm
+from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm, EditUserForm
 from functools import wraps
 
 app = Flask(__name__)
@@ -159,7 +159,7 @@ def signUp():
 
         except IntegrityError:
             flash("Email is already in use", "danger")
-            return render_template("users/signup.html", form=form)
+            return redirect("/sign-up")
         
         handle_login(user)
 
@@ -202,30 +202,55 @@ def get_users():
     users = User.query.all()
     return render_template("/users/index.html", users=users)
 
-@app.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@app.route("/users/<int:user_id>")
 @authorize
-@check_same_user
-def edit_user(user_id):
-    """edit user information"""
+def show_user(user_id):
+    """show user details"""
 
     user = User.query.get_or_404(user_id)
 
-    form = SignUpForm(obj=user)
+    return render_template("/users/show.html", user=user)
 
-    form.user_role.choices = db.session.query(Role.id, Role.role).all()
+@app.route("/users/settings", methods=["GET", "POST"])
+@authorize
+def edit_user():
+    """edit user information"""
+
+    form = EditUserForm(obj=g.user)
 
     if form.validate_on_submit():
-        user.first_name=form.first_name.data
-        user.last_name=form.last_name.data
-        user.email = form.email.data
-        user.department = form.department.data
-        user.password = form.password.data
-        user.image_url = form.image_url.data
-        user.current_role_id = form.user_role.data
-        db.session.commit()
+        
+        user = User.authenticate(g.user.email, form.current_password.data)
+        
+        if user:
+            
+            
+            try:
+                user.first_name=form.first_name.data
+                user.last_name=form.last_name.data
+                user.email = form.email.data
+                user.department = form.department.data
+                user.image_url = form.image_url.data
+                user.current_role_id = form.current_role_id.data
+                
+                if form.new_password.data:
+                    
+                    if user.check_password_reused(form.new_password.data):
+                        flash("Password is already in use")
+                        return redirect("/users/settings")
 
-        flash("Profile successfully updated")
-        return redirect("/")
+                    user.password = form.new_password.data
+
+                db.session.commit()
+
+                flash("Profile successfully updated", "success")
+                return redirect(f"/users/{user.id}")
+            except IntegrityError:
+                flash("Email is already in use", "danger")
+                return redirect("users/settings")
+        else:
+            flash("invalid password", "danger")
+            return redirect("/users/settings")
     
     return render_template("/users/edit.html", form=form)
 
@@ -325,8 +350,7 @@ def droplist_accept_decline(droplist_id):
     droplist = DropList.query.get_or_404(droplist_id)
     
     choice = request.form.get("choice")
-    print("////////////////////////")
-    print(choice)
+  
     if choice == "accepted" or choice == "declined":
         droplist.status = choice
         db.session.commit()
@@ -530,6 +554,30 @@ def delete_location(location_id):
 
     flash("Location successfully deleted")
     return redirect("/")
+
+#################################################
+#JSON routes
+
+@app.route("/forklift_driver/droplist_chart")
+@authorize
+def get_all_accepted_drivers_droplist():
+    """Return the number of droplist accepted for all drivers"""
+    complete_filter = request.args.get("completed", "accepted")
+    chart_type = request.args.get("type", "bar")
+
+    all_drivers = db.session.query(ForkliftDriver).all()
+
+    drivers_names = [d.full_name for d in all_drivers]
+
+    chart_dict = {
+        type: chart_type,
+        "data": {
+            "labels": 
+        }
+    }
+
+
+
 
 #################################################
 #error routes

@@ -23,13 +23,43 @@ class SignUpForm(FlaskForm):
                                                 password must contain at least 1 number,
                                                 password must contain at least 1 special character""")])
                                                                     
-    confirm = PasswordField("Repeat Password")
+    confirm = PasswordField("Confirm Password")
 
     image_url = StringField("Image", validators=[Optional()])
 
-    user_role = SelectField("Role", validators=[InputRequired()], coerce=int)
+    user_role = SelectField("Role", validators=[InputRequired()], choices=[(1, "Stocker"), (2, "Forklift Driver")], coerce=int)
 
     # user_type = RadioField("Are you a...", validators=[InputRequired()], choices=[("Stocker", "stocker"), ("Forklift Driver", "driver")])
+
+class EditUserForm(FlaskForm):
+    """Form that signup users"""
+
+    first_name = StringField("Firstname", validators=[DataRequired(message="Firstname cannot be blank")])
+    
+    last_name = StringField("Lastname", validators=[DataRequired(message="Lastname cannot be blank")])
+    
+    email = StringField("E-Mail", validators=[InputRequired(), Email()])
+
+    department = SelectField("Department", validators=[InputRequired()], choices=[("hardlines", "Hardlines"), ("freezer", "Freezer"), 
+                                            ("receiving", "Receiving"), ("sundries","Sundries")])
+
+    current_password = PasswordField("Enter Current Password to save settings", validators=[InputRequired()])
+    
+    new_password = PasswordField("New Password", validators=[Optional(), EqualTo("confirm", message="Passwords must match"), 
+                                        Regexp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+                                                ,flags=0,
+                                                message=
+                                                """Password must be 8 characters or greater long, 
+                                                password must contain at least 1 capital letter, 
+                                                password must contain at least 1 number,
+                                                password must contain at least 1 special character""")])
+                                                                    
+    confirm = PasswordField("comfirm Password")
+
+    image_url = StringField("Image", validators=[Optional()])
+
+    current_role_id = SelectField("Role", validators=[InputRequired()], choices=[(1, "Stocker"), (2, "Forklift Driver")], coerce=int)
+
 class LoginForm(FlaskForm):
     """Form for authenticating a user"""
     email = StringField("Email", validators=[InputRequired()])

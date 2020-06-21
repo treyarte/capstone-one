@@ -1,5 +1,5 @@
 {%extends "base.html"%} {%block content%}
-<form action="/sign-up" method="post">
+<form action="/users/settings" method="post">
   {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
   "hidden"%} {%for error in field.errors%}
   <span class="text-danger">{{error}}</span>

@@ -63,6 +63,15 @@ class User(db.Model):
     def __repr__(self):
         return f"<User #{self.id}: {self.first_name} {self.last_name} {self.email}>"
 
+    def check_password_reused(self, new_password):
+        """check if the user is currently using the password"""
+        hashed_pwd = bcrypt.generate_password_hash(new_password).decode('UTF-8')
+
+        if hashed_pwd == self.password:
+            return True
+        else:
+            return False
+
     @classmethod
     def sign_up(cls, first_name, last_name, email, department, password, current_role_id, image_url=None):
         """Sign users up and hash passwords"""
@@ -97,7 +106,7 @@ class User(db.Model):
             if is_auth:
                 return user
         
-        return False
+        return False 
 class ForkliftDriver(db.Model):
     """A user that receives and completes a drop list"""
 
