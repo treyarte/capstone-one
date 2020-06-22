@@ -44,17 +44,6 @@ class EditUserForm(FlaskForm):
                                             ("receiving", "Receiving"), ("sundries","Sundries")])
 
     current_password = PasswordField("Enter Current Password to save settings", validators=[InputRequired()])
-    
-    new_password = PasswordField("New Password", validators=[Optional(), EqualTo("confirm", message="Passwords must match"), 
-                                        Regexp("^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
-                                                ,flags=0,
-                                                message=
-                                                """Password must be 8 characters or greater long, 
-                                                password must contain at least 1 capital letter, 
-                                                password must contain at least 1 number,
-                                                password must contain at least 1 special character""")])
-                                                                    
-    confirm = PasswordField("comfirm Password")
 
     image_url = StringField("Image", validators=[Optional()])
 

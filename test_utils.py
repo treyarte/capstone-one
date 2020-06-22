@@ -38,12 +38,14 @@ def droplist_setup():
     db.session.commit()
     
     droplist = DropList(stocker_id=s1.id, description="Test Drop", department="hardlines", forklift_driver_id=f1.id)
-
+    droplist_2 = DropList(stocker_id=s1.id, description="Test Droplist 2", department="hardlines")
+    droplist_3 = DropList(stocker_id=s2.id, description="Test Droplist 3", department="sundries")
+    
     values.extend([s1,s2,f1])
 
-    db.session.add(droplist)
+    db.session.add_all([droplist, droplist_2, droplist_3])
     db.session.commit()
 
-    values.append(droplist)
+    values.extend([droplist, droplist_2, droplist_3])
 
     return values

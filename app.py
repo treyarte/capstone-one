@@ -1,7 +1,7 @@
 import os
 from flask import Flask, redirect, render_template, flash, session, g, Response, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item
+from models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item, get_droplists
 from sqlalchemy.exc import IntegrityError
 from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm, EditUserForm
 from functools import wraps
@@ -223,8 +223,7 @@ def edit_user():
         user = User.authenticate(g.user.email, form.current_password.data)
         
         if user:
-            
-            
+                  
             try:
                 user.first_name=form.first_name.data
                 user.last_name=form.last_name.data
@@ -232,17 +231,20 @@ def edit_user():
                 user.department = form.department.data
                 user.image_url = form.image_url.data
                 user.current_role_id = form.current_role_id.data
-                
-                if form.new_password.data:
-                    
-                    if user.check_password_reused(form.new_password.data):
-                        flash("Password is already in use")
-                        return redirect("/users/settings")
-
-                    user.password = form.new_password.data
-
                 db.session.commit()
 
+                if user.current_role.role == "stocker":
+                    if user.get_stocker is None:
+                        stocker = Stocker(user_id=user.id)
+                        db.session.add(stocker)
+                        db.session.commit()
+
+                elif user.current_role.role == "forklift_driver":
+                    if user.get_driver is None:
+                        forklift_driver = ForkliftDriver(user_id=user.id)
+                        db.session.add(forklift_driver)
+                        db.session.commit()
+                        
                 flash("Profile successfully updated", "success")
                 return redirect(f"/users/{user.id}")
             except IntegrityError:
@@ -275,12 +277,14 @@ def droplist_index():
 
     droplists = None
 
-    department_filter = request.args.get("department",g.user.department)
+    #future implementation
+    # department_filter = request.args.get("department",g.user.department)
 
     if g.user.current_role.role == "stocker":
-        droplists = g.user.get_stocker.get_droplists_by_department(department_filter)
+        # droplists = g.user.get_stocker.get_droplists_by_department(department_filter)
+        droplists =get_droplists(g.user.get_stocker, Stocker)
     elif g.user.current_role.role == "forklift_driver":
-        droplists = g.user.get_driver.droplists
+        droplists =get_droplists(g.user.get_driver, ForkliftDriver)
 
 
     return render_template("/droplists/index.html", droplists = droplists)
@@ -348,7 +352,7 @@ def send_droplist(droplist_id):
 def droplist_accept_decline(droplist_id):
     """driver accepts or declines a droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
-    
+
     choice = request.form.get("choice")
   
     if choice == "accepted" or choice == "declined":

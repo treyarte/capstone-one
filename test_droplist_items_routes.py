@@ -66,3 +66,13 @@ class DroplistItemsViewsTestCase(TestCase):
             droplist = DropList.query.get(self.droplist_id)
             item = Item.query.filter(Item.description=="test strawberries").first()
             self.assertIn(item,droplist.droplist_items)
+
+    def test_droplist_index(self)
+    
+    def test_droplist_show_item(self)
+
+    def test_droplist_edit_item(self)
+
+    def test_droplist_delete_item(self)
+
+    

@@ -7,6 +7,14 @@ from datetime import datetime
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+def get_droplists(model_instance, sql_model):
+    """Pass in a model and instance of that model that have a relationship with the droplist table to retrieve its droplists."""
+    droplists = db.session.query(DropList).join(
+            sql_model, sql_model.id==DropList.stocker_id).filter(
+                model_instance.id == sql_model.id
+            ).all()
+    return droplists
+
 class Role(db.Model):
     """Role model"""
 
@@ -63,14 +71,6 @@ class User(db.Model):
     def __repr__(self):
         return f"<User #{self.id}: {self.first_name} {self.last_name} {self.email}>"
 
-    def check_password_reused(self, new_password):
-        """check if the user is currently using the password"""
-        hashed_pwd = bcrypt.generate_password_hash(new_password).decode('UTF-8')
-
-        if hashed_pwd == self.password:
-            return True
-        else:
-            return False
 
     @classmethod
     def sign_up(cls, first_name, last_name, email, department, password, current_role_id, image_url=None):
@@ -153,10 +153,10 @@ class ForkliftDriver(db.Model):
         if department != "all":
             forklift_drivers = db.session.query(ForkliftDriver).join(
                 User, User.id == ForkliftDriver.user_id).filter(
-                    User.department==department).all()
+                   User.department==department).filter(User.current_role_id==2).all()
         else:
             forklift_drivers = db.session.query(ForkliftDriver).join(
-                User, User.id == ForkliftDriver.user_id).all()
+                User, User.id == ForkliftDriver.user_id).filter(User.current_role_id==2).all()
         
         return forklift_drivers
 class Stocker(db.Model):
@@ -179,13 +179,14 @@ class Stocker(db.Model):
     droplists = db.relationship("DropList", backref=db.backref("stocker"))
     user = db.relationship("User", backref=db.backref("stocker"), uselist=False)
 
-    def get_droplists_by_department(self, department):
-        if department == "all":
-            droplists = db.session.query(DropList).join(Stocker, Stocker.id == DropList.stocker_id).filter(Stocker.id==self.id)
-        else:
-            droplists = db.session.query(DropList).join(
-                            Stocker, Stocker.id == DropList.stocker_id).filter(DropList.department == department).filter(Stocker.id==self.id)
-        return droplists
+    # def get_droplists_by_department(self, department):
+    # """Get droplists by the department"""
+    #     if department == "all":
+    #         droplists = db.session.query(DropList).join(Stocker, Stocker.id == DropList.stocker_id).filter(Stocker.id==self.id)
+    #     else:
+    #         droplists = db.session.query(DropList).join(
+    #                         Stocker, Stocker.id == DropList.stocker_id).filter(DropList.department == department).filter(Stocker.id==self.id)
+    #     return droplists
 class DropList(db.Model):
     """A droplist created by a stocker and sent to a driver"""
 

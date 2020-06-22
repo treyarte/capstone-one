@@ -84,35 +84,32 @@ class UserRoutesTestCase(TestCase):
                 sess[CURR_USER_KEY] = self.u1.id
                 self.role_id = self.role1.id
             
-            resp = c.post(f"/users/{self.u1.id}/edit", data={
+            resp = c.post(f"/users/settings", data={
                             "first_name":"Test", "last_name":"Person", 
                             "email":"person@test.net", "department":"sundries", 
-                            "password":"Qwerty123!", "confirm": "Qwerty123!", "user_role":self.role_id})
+                            "current_password": "Qwerty123!", "current_role_id":self.role_id})
 
             self.assertEqual(resp.status_code, 302)
             user = User.query.filter(User.first_name=="Test").first()
             self.assertEqual(user.email, "person@test.net")
         
-    def test_wrong_user_edit(self):
-        """Test if redirected if a user tries to edit someone else profile"""
+    def test_wrong_user_password(self):
+        """Test if flash if wrong password"""
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.u1.id
-                self.u2_id = self.u2.id
                 self.role_id = self.role1.id
         
-        resp = c.post(f"/users/{self.u2_id}/edit", data={
+        resp = c.post(f"/users/settings", data={
                             "first_name":"Test", "last_name":"Person", 
                             "email":"person@test.net", "department":"sundries", 
-                            "password":"Qwerty123!", "confirm": "Qwerty123!", "user_role":self.role_id}, follow_redirects=True)
+                            "current_password": "wqq!", "current_role_id":self.role_id}, follow_redirects=True)
         
         html = resp.get_data(as_text=True)
 
         
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("Unauthorized access",html)
-        user = User.query.get(self.u2_id)
-        self.assertNotEqual(user.email, "person@test.net")
+        self.assertIn("invalid password",html)
 
     def test_delete_user(self):
         """Test if the logged in user can delete their profile"""
@@ -125,3 +122,6 @@ class UserRoutesTestCase(TestCase):
         self.assertEqual(resp.status_code, 302)
         user = User.query.filter(User.email == "test@person.com").first()
         self.assertIsNone(user)
+    
+    def test_user_settings(self):
+        self.assertIsNone(None)
