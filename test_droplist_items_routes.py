@@ -114,13 +114,41 @@ class DroplistItemsViewsTestCase(TestCase):
             self.assertIn("Test Item 2", html)
             self.assertIn("Test Item 3", html)
 
+    def test_droplist_show_item(self):
+        """Test if user can view a single item in a droplist"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1.id
+                self.droplist_id = self.droplist_2.id
+                self.item_id = self.item_1.id
+            
+            resp = c.get(f"/droplists/{self.droplist_id}/items/{self.item_id}")
+            html = resp.get_data(as_text=True)
+            
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Test Item 1", html)
 
+    def test_droplist_edit_item(self):
+        """Test if a user can edit an item"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1.id
+                self.droplist_id = self.droplist_2.id
+                self.item_id = self.item_1.id
+                self.loc_id = self.loc_2.id
+            
+            resp = c.post(f"/droplists/{self.droplist_id}/items/{self.item_id}/edit", 
+                            data={"row_letter": "b", "column_number": 9, 
+                                 "location_id": self.loc_id, "description": "updated item"})
+            
+            self.assertEqual(resp.status_code, 302)
+            
+            item = Item.query.get(self.item_id)
+            self.assertEqual("updated item", item.description)
+            self.assertEqual("b", item.row_letter)
+            self.assertEqual(9, item.column_number)
+            self.assertEqual(self.loc_id, item.location_id)
 
-
-
-    # def test_droplist_show_item(self)
-
-    # def test_droplist_edit_item(self)
 
     # def test_droplist_delete_item(self)
 
