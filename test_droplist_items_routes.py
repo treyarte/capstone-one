@@ -150,5 +150,19 @@ class DroplistItemsViewsTestCase(TestCase):
             self.assertEqual(self.loc_id, item.location_id)
 
 
-    # def test_droplist_delete_item(self)
+    def test_droplist_delete_item(self):
+        """Test if a user can delete a item"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1.id
+                self.droplist_id = self.droplist_2.id
+                self.item_id = self.item_1.id
+            
+            resp = c.post(f"/droplists/{self.droplist_id}/items/{self.item_id}/delete")
+
+            self.assertEqual(resp.status_code, 302)
+
+            item = Item.query.get(self.item_id)
+
+            self.assertIsNone(item)
 
