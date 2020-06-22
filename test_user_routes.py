@@ -27,8 +27,8 @@ class UserRoutesTestCase(TestCase):
         
         self.client = app.test_client()
 
-        role1 = Role(role="stocker")
-        role2 = Role(role="forklift_driver")
+        role1 = Role(id = 1,role="stocker")
+        role2 = Role(id = 2, role="forklift_driver")
 
         db.session.add_all([role1, role2])
         db.session.commit()
@@ -87,7 +87,7 @@ class UserRoutesTestCase(TestCase):
             resp = c.post(f"/users/settings", data={
                             "first_name":"Test", "last_name":"Person", 
                             "email":"person@test.net", "department":"sundries", 
-                            "current_password": "Qwerty123!", "current_role_id":self.role_id})
+                            "current_password": "Qwerty123!", "current_role_id":1})
 
             self.assertEqual(resp.status_code, 302)
             user = User.query.filter(User.first_name=="Test").first()
@@ -103,7 +103,7 @@ class UserRoutesTestCase(TestCase):
         resp = c.post(f"/users/settings", data={
                             "first_name":"Test", "last_name":"Person", 
                             "email":"person@test.net", "department":"sundries", 
-                            "current_password": "wqq!", "current_role_id":self.role_id}, follow_redirects=True)
+                            "current_password": "wqq!", "current_role_id":1}, follow_redirects=True)
         
         html = resp.get_data(as_text=True)
 
