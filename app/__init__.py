@@ -8,6 +8,7 @@ from functools import wraps
 
 from app.home.routes import home
 from app.users.routes import users_route
+from app.droplists.routes import droplist_routes
 
 CURR_USER_KEY = "curr_user"
 
@@ -40,6 +41,7 @@ def create_app():
 
     app.register_blueprint(home)
     app.register_blueprint(users_route)
+    app.register_blueprint(droplist_routes)
 
     return app
 

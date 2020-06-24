@@ -3,12 +3,14 @@
 import os
 from unittest import TestCase
 
-from models import db, User, ForkliftDriver, Stocker, Role
+from app.models import db, User, ForkliftDriver, Stocker, Role
 
 
 os.environ["DATABASE_URL"] = "postgresql:///mydroplist-test"
 
-from app import app
+from app import create_app
+
+app = create_app()
 
 app.config["SQLALCHEMY_ECHO"] = False
 

@@ -9,8 +9,14 @@ bcrypt = Bcrypt()
 
 def get_droplists(model_instance, sql_model):
     """Pass in a model and instance of that model that have a relationship with the droplist table to retrieve its droplists."""
+    droplist_rel_id = None
+    if isinstance(model_instance, ForkliftDriver):
+        droplist_rel_id = DropList.forklift_driver_id
+    elif isinstance(model_instance, Stocker):
+        droplist_rel_id = DropList.stocker_id
+
     droplists = db.session.query(DropList).join(
-            sql_model, sql_model.id==DropList.stocker_id).filter(
+            sql_model, sql_model.id==droplist_rel_id).filter(
                 model_instance.id == sql_model.id
             ).all()
     return droplists
@@ -133,7 +139,7 @@ class ForkliftDriver(db.Model):
         nullable=False
     )
 
-    droplists = db.relationship("DropList", backref=db.backref("forklift_driver", cascade="delete"))
+    droplists = db.relationship("DropList", backref=db.backref("forklift_driver"))
     user = db.relationship("User", backref=db.backref("forklift_driver", cascade="all, delete"), uselist=False)
 
     def get_droplists_by_department(self, department):
