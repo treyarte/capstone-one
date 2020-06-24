@@ -1,7 +1,9 @@
 """Seed the database with sample data"""
 
-from app import db
-from models import Role, User, Stocker, ForkliftDriver, DropList, Location, Item
+from app.models import Role, User, Stocker, ForkliftDriver, DropList, Location, Item, db
+from app import create_app
+
+app = create_app()
 
 db.drop_all()
 db.create_all()

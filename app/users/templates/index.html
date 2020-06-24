@@ -1,0 +1,7 @@
+{%extends "base.html"%}{%block content%} {%for user in users%}
+<div>
+  <a href="/users/{{user.id}}">
+    {{user.first_name}} {{user.last_name}}
+  </a>
+</div>
+{%endfor%} {%endblock%}

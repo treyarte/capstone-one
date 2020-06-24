@@ -177,7 +177,7 @@ class Stocker(db.Model):
     )
 
     droplists = db.relationship("DropList", backref=db.backref("stocker"))
-    user = db.relationship("User", backref=db.backref("stocker"), uselist=False)
+    user = db.relationship("User", backref=db.backref("stocker"), cascade="delete", uselist=False)
 
     # def get_droplists_by_department(self, department):
     # """Get droplists by the department"""

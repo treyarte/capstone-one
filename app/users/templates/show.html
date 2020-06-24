@@ -1,0 +1,21 @@
+{%extends "base.html"%}{%block content%}
+<div>
+  <div>
+    <h2>{{user.first_name}} {{user.last_name}}</h2>
+    <span> <strong>Department:</strong> {{user.department}}</span>
+  </div>
+  <div>
+    <div>
+      <h5>Role</h5>
+      <p>
+        {{user.current_role.role}}
+      </p>
+    </div>
+    {%if g.user.id == user.id%}
+    <form action="/users/{{user.id}}/delete" method="post">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    {%endif%}
+  </div>
+</div>
+{%endblock%}
