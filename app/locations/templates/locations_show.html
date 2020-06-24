@@ -1,0 +1,6 @@
+{%extends "base.html"%}{%block content%}
+<div>{{location.name}}</div>
+<form action="/locations/{{location.id}}/delete" method="post">
+  <button type="submit">Delete</button>
+</form>
+{%endblock%}

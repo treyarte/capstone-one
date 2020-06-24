@@ -257,7 +257,7 @@ class Item(db.Model):
 
     column_number = db.Column(db.Integer, nullable=False)
 
-    location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey("locations.id",ondelete="SET NULL"), nullable=True)
 
     droplist_id = db.Column(db.Integer, db.ForeignKey("droplists.id", ondelete="CASCADE"), nullable=False)
 

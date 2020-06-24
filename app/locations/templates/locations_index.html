@@ -1,0 +1,9 @@
+{%extends "base.html"%}{%block content%} {%if locations%} {%for location in
+locations%}
+<p>{{location.name}}</p>
+<a href="/locations/{{location.id}}">view</a>
+{%endfor%} {%else%}
+<p>No locations created</p>
+{%endif%}
+<a href="/locations/new">Create Location</a>
+{%endblock%}
