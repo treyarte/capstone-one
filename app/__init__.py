@@ -11,6 +11,7 @@ from app.users.routes import users_route
 from app.droplists.routes import droplist_routes
 from app.droplist_items.routes import droplist_items_route
 from app.locations.routes import locations
+from app.api.routes import api
 
 CURR_USER_KEY = "curr_user"
 
@@ -46,6 +47,7 @@ def create_app():
     app.register_blueprint(droplist_routes)
     app.register_blueprint(droplist_items_route)
     app.register_blueprint(locations)
+    app.register_blueprint(api)
 
     return app
 
