@@ -6,3 +6,5 @@ home = Blueprint("home", __name__, template_folder="templates")
 def homepage():
     """Home page of the application"""
     return render_template("home.html")
+
+

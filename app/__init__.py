@@ -1,10 +1,7 @@
 import os
 from flask import Flask, redirect, render_template, flash, session, g, Response, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from app.models import connect_db, db, Role, User, Stocker, ForkliftDriver, DropList, Location, Item, get_droplists
-from sqlalchemy.exc import IntegrityError
-from forms import SignUpForm, LoginForm, LocationForm, ItemForm, DropListForm, EditUserForm
-from functools import wraps
+from app.models import connect_db, User
 
 from app.home.routes import home
 from app.users.routes import users_route
@@ -41,6 +38,11 @@ def create_app():
         
         else:
             g.user = None
+
+    @app.errorhandler(404)
+    def not_found(e):
+
+        return render_template("404.html"), 404
 
     app.register_blueprint(home)
     app.register_blueprint(users_route)
