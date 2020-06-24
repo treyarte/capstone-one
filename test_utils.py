@@ -1,4 +1,4 @@
-from models import Role, User, Stocker, ForkliftDriver, DropList, db
+from app.models import Role, User, Stocker, ForkliftDriver, DropList, db
 
 def droplist_setup():
     User.query.delete()

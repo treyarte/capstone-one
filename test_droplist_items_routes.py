@@ -2,12 +2,14 @@
 
 import os
 from unittest import TestCase
-from models import db, User, Stocker, ForkliftDriver, DropList, Location, Item, Role
+from app.models import db, User, Stocker, ForkliftDriver, DropList, Location, Item, Role
 from test_utils import droplist_setup
 
 os.environ["DATABASE_URL"] = "postgresql:///mydroplist-test"
 
-from app import app, CURR_USER_KEY
+from app import create_app, CURR_USER_KEY
+
+app = create_app()
 
 app.config["SQLALCHEMY_ECHO"] = False
 
@@ -89,7 +91,7 @@ class DroplistItemsViewsTestCase(TestCase):
                 self.droplist_id = self.droplist.id
                 self.loc_id = self.loc.id
         
-            resp = c.post(f"/droplists/{self.droplist_id}/items/add", 
+            resp = c.post(f"/droplists/{self.droplist_id}/items/new", 
                             data={"row_letter": "a", "column_number": 10, 
                                  "location_id": self.loc_id, "description": "test strawberries"})
 

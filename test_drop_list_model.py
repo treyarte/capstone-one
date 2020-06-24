@@ -3,12 +3,14 @@
 import os
 from unittest import TestCase
 
-from models import db, Role, User, ForkliftDriver, Stocker, Item, Location, DropList
+from app.models import db, Role, User, ForkliftDriver, Stocker, Item, Location, DropList
 from sqlalchemy.exc import IntegrityError
 
 os.environ["DATABASE_URL"] = "postgresql:///mydroplist-test"
 
-from app import app
+from app import create_app
+
+app = create_app()
 
 app.config["SQLALCHEMY_ECHO"] = False
 
