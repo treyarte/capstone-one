@@ -23,7 +23,7 @@ def create_app():
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "this is my secret")
     #removes caching
-    # app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
     toolbar = DebugToolbarExtension(app)
 
