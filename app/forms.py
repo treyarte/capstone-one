@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField, IntegerField
-from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange, DataRequired
+from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange, DataRequired, URL
 
 class SignUpForm(FlaskForm):
     """Form that signup users"""
@@ -25,7 +25,7 @@ class SignUpForm(FlaskForm):
                                                                     
     confirm = PasswordField("Confirm Password")
 
-    image_url = StringField("Image", validators=[Optional()])
+    image_url = StringField("Image Url", validators=[Optional(), URL(message="Image must be an URL")])
 
     user_role = SelectField("Role", validators=[InputRequired()], choices=[(1, "Stocker"), (2, "Forklift Driver")], coerce=int)
 

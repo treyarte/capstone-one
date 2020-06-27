@@ -5,9 +5,22 @@ body {
   height: 100%;
 }
 
+.custom-header {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .msg-container {
   margin-top: 1rem;
 }
+
+/**base page**/
 
 /**landing page**/
 
@@ -63,8 +76,19 @@ body {
   background-color: #212121;
 }
 
+/**Sign up css**/
+
+.signup-btn {
+  margin: 1rem 0;
+  background-color: #212121;
+}
+
 /**desktop queries**/
 @media only screen and (min-width: 1080px) {
+  .custom-header {
+    text-align: start;
+  }
+
   .landing-img-small {
     display: none;
   }
@@ -116,5 +140,11 @@ body {
   }
   .landing-btn {
     text-align: start;
+  }
+
+  /**signup css**/
+
+  .btn-container {
+    justify-content: flex-start;
   }
 }
