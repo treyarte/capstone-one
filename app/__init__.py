@@ -16,7 +16,7 @@ def create_app():
     app = Flask(__name__)
 
     #use the local db if environ DB_URI variable is not set
-    app.config["SQLALCHEMY_DATABASE_URI"] = ( os.environ.get("Database_URL", "postgres:///mydroplist"))
+    app.config["SQLALCHEMY_DATABASE_URI"] = ( os.environ.get("DATABASE_URL", "postgres:///mydroplist"))
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ECHO"] = True
