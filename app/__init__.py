@@ -31,7 +31,7 @@ def create_app():
 
     @app.before_request
     def add_global_user():
-        """Add logged in user to global"""
+        """Added logged in user to global"""
 
         if CURR_USER_KEY in session:
             g.user = User.query.get(session[CURR_USER_KEY])
