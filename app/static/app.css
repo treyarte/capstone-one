@@ -76,6 +76,10 @@ body {
   background-color: #212121;
 }
 
+.nav-container {
+  width: 100%;
+}
+
 /**Sign up css**/
 
 .signup-btn {
