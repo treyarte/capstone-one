@@ -30,25 +30,19 @@
 
         <div class="collapse navbar-collapse" id="droplist-navbar">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a href="/" class="nav-link">Home</a>
-            </li>
             {%if g.user%} {%if g.user.get_stocker%}
             <li class="nav-item">
-              <a href="/" class="nav-link">Create Droplist</a>
+              <a href="/droplists/new" class="nav-link">Create Droplist</a>
             </li>
             {%endif%}
             <li class="nav-item">
-              <a href="/droplits" class="nav-link">Droplists</a>
+              <a href="/droplists" class="nav-link">Droplists</a>
             </li>
             <li class="nav-item">
               <a href="/" class="nav-link">Graphs</a>
             </li>
             <li class="nav-item">
-              <a href="/users" class="nav-link">Users</a>
-            </li>
-            <li class="nav-item">
-              <a href="/setting" class="nav-link">settings</a>
+              <a href="users/settings" class="nav-link">settings</a>
             </li>
             <li class="nav-item">
               <form action="/logout" method="post">
@@ -79,6 +73,10 @@
     {%endif%}{%endwith%} {%block content%} {%endblock%}
 
     <script
+      src="https://kit.fontawesome.com/858809a5ac.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
       integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
       crossorigin="anonymous"
@@ -93,5 +91,6 @@
       integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
       crossorigin="anonymous"
     ></script>
+    <script src="../../static//app.js"></script>
   </body>
 </html>

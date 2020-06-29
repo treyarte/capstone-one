@@ -1,47 +1,77 @@
-{%extends "base.html"%}{%block content%} {%if droplists%} {%for droplist in
-droplists%}
-<div>
-  <a href="/droplists/{{droplist.id}}" class="btn btn-info">View</a>
-  <ul>
-    <li>
-      {{droplist.status}}
-    </li>
-    <li>
-      {{droplist.description}}
-    </li>
-    <li>
-      {{droplist.department}}
-    </li>
-    <li>
-      {{droplist.timestamp}}
-    </li>
+{%extends "base.html"%}{%block content%} {%if droplists%}
+<div class="container droplists-container">
+  <h2 class="custom-header">Droplists</h2>
+  <div class="row">
+    {%for droplist in droplists%}
 
-    {%if g.user.current_role.role == "forklift_driver"%}
-    <div>
-      <form action="/droplists/{{droplist.id}}/option" method="post">
-        <input type="hidden" name="choice" id="choice" value="accepted" />
-        {%if droplist.status == "accepted"%}
-        <button disabled="disabled">Accept</button>
-        {%else%}
-        <button type="submit">Accept</button>
+    <div class="droplist col-12 col-md-12 col-lg-5">
+      <h5>{{droplist.description}}</h5>
+      <span class="badge badge-pill {{droplist.status}}"
+        >{{droplist.status}}</span
+      >
+      <div>
+        <strong>Department:</strong>
+        <span class="badge badge-info">{{droplist.department}}</span>
+      </div>
+
+      <div><strong>Date:</strong> {{droplist.timestamp}}</div>
+      <div class="row mt-1">
+        {%if g.user.current_role.role == "stocker"%}
+        <div class="col-6">
+          <a
+            href="/droplists/{{droplist.id}}/edit"
+            class="btn btn-info droplist-link"
+            >Edit</a
+          >
+        </div>
+        <div class="col-6">
+          <a
+            href="/droplists/{{droplist.id}}/send"
+            class="btn btn-dark droplist-btn droplist-link"
+          >
+            Send <span class="fas fa-paper-plane"></span
+          ></a>
+        </div>
+        {%elif g.user.current_role.role == "forklift_driver"%}
+        <div class="col-6">
+          <form action="/droplists/{{droplist.id}}/option" method="post">
+            <input type="hidden" name="choice" id="choice" value="accepted" />
+            {%if droplist.status == "accepted"%}
+            <button disabled="disabled" class="btn btn-success">
+              Accept
+            </button>
+            {%else%}
+            <button type="submit" class="btn btn-success">Accept</button>
+            {%endif%}
+          </form>
+        </div>
+        <div class="col-6">
+          <form action="/droplists/{{droplist.id}}/option" method="post">
+            <input type="hidden" name="choice" id="choice" value="declined" />
+            {%if droplist.status == "declined"%}
+            <button disabled="disabled" class="btn btn-secondary droplist-btn">
+              Decline
+            </button>
+            {%else%}
+            <button type="submit" class="btn btn-secondary droplist-btn">
+              Decline
+            </button>
+            {%endif%}
+          </form>
+        </div>
         {%endif%}
-      </form>
+      </div>
     </div>
-    <div>
-      <form action="/droplists/{{droplist.id}}/option" method="post">
-        <input type="hidden" name="choice" id="choice" value="declined" />
-        {%if droplist.status == "declined"%}
-        <button disabled="disabled">Decline</button>
-        {%else%}
-        <button type="submit">Decline</button>
-        {%endif%}
-      </form>
-    </div>
+
+    {%endfor%} {%else%}
+    <div>You do not have any droplists!</div>
     {%endif%}
-  </ul>
+  </div>
+  <a href="/droplists/new" class="btn btn-lg btn-success droplist-create-btn"
+    ><span class="fas fa-plus"></span
+  ></a>
+  <a href="/droplists/new" class="btn btn-success droplist-create-btn-lg"
+    >Create Droplist</a
+  >
 </div>
-{%endfor%} {%else%}
-<p>Nothing to see here but us stockers</p>
-{%endif%}
-<a href="/droplists/new" class="btn btn-success">Create a new droplist</a>
 {%endblock%}
