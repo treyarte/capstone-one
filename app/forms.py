@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, RadioField, IntegerField
+from wtforms.fields import FieldList, FormField
 from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo, Optional, NumberRange, DataRequired, URL
 
 class SignUpForm(FlaskForm):
@@ -53,6 +54,16 @@ class LoginForm(FlaskForm):
     """Form for authenticating a user"""
     email = StringField("Email", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
+
+class ItemForm(FlaskForm):
+    """Form for items"""
+    row_letter = SelectField("Row", validators=[InputRequired()], choices=[("a", "A"), ("b", "B"), ("c", "C")])
+    column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
+    description = StringField("Description")
+    location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
+
+    def set_choices(self, db, obj):
+        self.location_id.choices = db.session.query(obj.id, obj.name).all()
 
 class DropListForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired(message="Description cannot be blank"), Length(min=3, max=100)])

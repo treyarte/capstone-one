@@ -137,6 +137,15 @@ body {
   color: var(--status-text-color);
 }
 
+/**items css**/
+.items-list {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 5px -2px #393e46;
+  margin-top: 1rem;
+}
+
 /**Navbar css**/
 .custom-navbar-bg {
   background-color: #212121;
