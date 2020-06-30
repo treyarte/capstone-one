@@ -212,7 +212,7 @@ class DropList(db.Model):
 
     status = db.Column(db.Text, nullable=False, default="not sent")
 
-    description = db.Column(db.Text, nullable=False, default=f"My Drop List-{datetime.utcnow()}")
+    description = db.Column(db.Text, nullable=False, default=f"My Drop List-{datetime.utcnow().strftime('%b %d, %y %I:%M%p')}")
 
     @property
     def droplist_items(self):

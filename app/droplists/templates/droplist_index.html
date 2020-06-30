@@ -5,16 +5,24 @@
     {%for droplist in droplists%}
 
     <div class="droplist col-12 col-md-12 col-lg-5">
-      <h5>{{droplist.description}}</h5>
+      <h5>
+        {{droplist.description}}
+        <a href="/droplists/{{droplist.id}}" class="btn-link">view</a>
+      </h5>
+
       <span class="badge badge-pill {{droplist.status}}"
         >{{droplist.status}}</span
       >
+
       <div>
         <strong>Department:</strong>
         <span class="badge badge-info">{{droplist.department}}</span>
       </div>
 
-      <div><strong>Date:</strong> {{droplist.timestamp}}</div>
+      <div>
+        <strong>Date:</strong> {{droplist.timestamp.strftime('%b %d, %y
+        %I:%M%p')}}
+      </div>
       <div class="row mt-1">
         {%if g.user.current_role.role == "stocker"%}
         <div class="col-6">
