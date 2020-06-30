@@ -3,6 +3,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
+from app.helpers.utils import tuple_convertor
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -218,6 +219,20 @@ class DropList(db.Model):
     def droplist_items(self):
         items = db.session.query(Item).join(DropList, Item.droplist_id==DropList.id).filter(DropList.id==self.id).all()
         return items
+    
+    @property
+    def group_droplist_items_location(self):
+        """return a dictionary of items and locations"""
+        item_loc_tuple = db.session.query(
+                            Location.name, Item).join(
+                                Item, Location.id==Item.location_id).join(DropList, Item.droplist_id==DropList.id).filter(
+                                    DropList.id==self.id).all() 
+        
+        grouped_items = tuple_convertor(item_loc_tuple)
+
+        return grouped_items
+
+
     
     def check_item(self, item):
         """Check if an item is in the droplist"""

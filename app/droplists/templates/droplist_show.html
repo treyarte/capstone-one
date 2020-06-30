@@ -9,26 +9,28 @@
     <div class="col-6">Status: {{droplist.status}}</div>
   </div>
 
-  {%if droplist.items%} {%for item in droplist.items%}
-  <div class="location">
-    <h4>{{item.location.name}}</h4>
-    <div class="items-list">
-      <div>
-        {{item.description}}
-        <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
-      </div>
+  {%if droplist.items%} {%for key, values in
+  droplist.group_droplist_items_location.items()%}
+  <div class="items-list">
+    <div class="location">
+      <h3>
+        {{key}}
+      </h3>
     </div>
+    {%for item in values %}
+    <div class="item">
+      <span class="item-info"
+        >{{item.row_letter}}{{item.column_number}} {{item.description}}</span
+      >
+      <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
+    </div>
+    {%endfor%}
   </div>
-  {%endfor%} {%endif%} {%if g.user.current_role.role == "stocker" and
-  g.user.get_stocker.id == droplist.stocker_id%}
+
+  {%endfor%} {%for item in droplist.items%} {%endfor%} {%endif%} {%if
+  g.user.current_role.role == "stocker" and g.user.get_stocker.id ==
+  droplist.stocker_id%}
   <a href="/droplists/{{droplist.id}}/items/new">Add Items</a>
-  <a href="/droplists/{{droplist.id}}/edit" class="btn btn-info">Edit</a>
-  <form action="/droplists/{{droplist.id}}/send" method="post">
-    <button type="submit" class="btn btn-primary">Send</button>
-  </form>
   {%endif%}
-  <form action="/droplists/{{droplist.id}}/delete" method="post">
-    <button type="submit">Delete</button>
-  </form>
 </div>
 {%endblock%}

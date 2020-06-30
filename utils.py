@@ -40,3 +40,4 @@ def create_sample_data(db,Role, User, Location, Stocker, ForkliftDriver, Item, D
 
     #req_items is a list of request item objects
     return [u1, u2, s1, d1, loc1, loc2, droplist_1, item1, item2, item3]
+
