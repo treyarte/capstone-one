@@ -37,7 +37,7 @@ def create_droplist():
         db.session.add(droplist)
         db.session.commit()
         
-        flash("Droplist successfully created")
+        flash("Droplist successfully created", "success")
         return redirect(f"/droplists/{droplist.id}")
     
     return render_template("/droplist_form.html", form=form)

@@ -33,12 +33,31 @@
           >
         </div>
         <div class="col-6">
+          {%if not droplist.droplist_items%}
+          <div
+            class="tooltip-wrapper"
+            data-toggle="tooltip"
+            data-trigger="click"
+            title="Add items to the droplist by going to view"
+          >
+            <a
+              href="/droplists/{{droplist.id}}/send"
+              class="btn btn-dark droplist-btn droplist-link disabled"
+              aria-disabled="true"
+              data-toggle="tooltip"
+              title="Hooray!"
+            >
+              Send <span class="fas fa-paper-plane"></span
+            ></a>
+          </div>
+          {%else%}
           <a
             href="/droplists/{{droplist.id}}/send"
             class="btn btn-dark droplist-btn droplist-link"
           >
             Send <span class="fas fa-paper-plane"></span
           ></a>
+          {%endif%}
         </div>
         {%elif g.user.current_role.role == "forklift_driver"%}
         <div class="col-6">

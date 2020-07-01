@@ -199,6 +199,16 @@ body {
     display: none;
   }
 
+  .tooltip-wrapper {
+    display: inline-block;
+    text-align: end;
+    float: right;
+  }
+
+  .tooltip-wrapper .droplist-link {
+    pointer-events: none;
+  }
+
   /**landing css**/
   .landing-img-small {
     display: none;

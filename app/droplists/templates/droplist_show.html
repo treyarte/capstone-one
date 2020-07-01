@@ -2,11 +2,19 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-      <h2>{{droplist.description}}</h2>
+      <h2 class="custom-header">{{droplist.description}}</h2>
     </div>
-    <div class="col-6">department:{{droplist.department}}</div>
-    <div class="col-6">Time: {{droplist.timestamp}}</div>
-    <div class="col-6">Status: {{droplist.status}}</div>
+    <div class="col-12">
+      <span class="badge badge-info">{{droplist.department}}</span>
+    </div>
+    <div class="col-12">
+      <span class="badge badge-pill {{droplist.status}}"
+        >{{droplist.status}}</span
+      >
+      <div class="col-12">
+        <em>{{droplist.timestamp.strftime('%b %d, %y %I:%M%p')}}</em>
+      </div>
+    </div>
   </div>
 
   {%if droplist.items%} {%for key, values in
@@ -27,10 +35,17 @@
     {%endfor%}
   </div>
 
-  {%endfor%} {%for item in droplist.items%} {%endfor%} {%endif%} {%if
-  g.user.current_role.role == "stocker" and g.user.get_stocker.id ==
-  droplist.stocker_id%}
-  <a href="/droplists/{{droplist.id}}/items/new">Add Items</a>
+  {%endfor%} {%for item in droplist.items%} {%endfor%} {%else%}
+  <div><em>There are no items in this droplist</em></div>
+
+  {%endif%} {%if g.user.current_role.role == "stocker" and g.user.get_stocker.id
+  == droplist.stocker_id%}
+  <a
+    href="/droplists/{{droplist.id}}/items/new"
+    class="btn btn-lg btn-success mt-3 mb-3"
+    >Add Item</a
+  >
+
   {%endif%}
 </div>
 {%endblock%}
