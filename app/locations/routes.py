@@ -49,7 +49,7 @@ def edit_location(location_id):
 
         db.session.commit()
         
-        flash("Location successfully updated")
+        flash("Location successfully updated", "success")
         return redirect(f"/locations/{location.id}")
     
     return render_template("/locations_edit.html", form=form)

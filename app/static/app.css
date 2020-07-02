@@ -38,6 +38,13 @@ body {
   float: right;
 }
 
+.delete-item-btn {
+  border: none;
+  padding: 0;
+  float: right;
+  margin-right: 0.5rem;
+}
+
 .msg-container {
   margin-top: 1rem;
 }
@@ -152,6 +159,11 @@ body {
 
 .rejected {
   background-color: #d9534f;
+  color: var(--status-text-color);
+}
+
+.completed {
+  background-color: #232931;
   color: var(--status-text-color);
 }
 

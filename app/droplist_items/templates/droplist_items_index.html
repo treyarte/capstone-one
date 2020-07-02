@@ -1,35 +1,38 @@
 {%extends "base.html"%}{%block content%}
-<div>
-  {%if droplist.items%}
-  <table>
-    <tr>
-      <th>Row</th>
-      <th>Column</th>
-      <th>Description</th>
-    </tr>
-    {%for item in droplist.items%}
-    <tr>
-      <td>
-        {{item.row_letter}}
-      </td>
+<div class="container">
+  <div class="custom-container">
+    <h2 class="custom-header">Items</h2>
+    {%if droplist.items%}
+    <table>
+      <tr>
+        <th>Row</th>
+        <th>Column</th>
+        <th>Description</th>
+      </tr>
+      {%for item in droplist.items%}
+      <tr>
+        <td>
+          {{item.row_letter}}
+        </td>
 
-      <td>
-        {{item.column_number}}
-      </td>
+        <td>
+          {{item.column_number}}
+        </td>
 
-      <td>
-        {{item.description}}
-      </td>
-      <td>
-        <a href="/droplists/{{droplist.id}}/items/{{item.id}}">view</a>
-      </td>
-    </tr>
-    {%endfor%}
-  </table>
-  {%else%}
-  <div>
-    <p>Nothing to see here but us stockers!</p>
+        <td>
+          {{item.description}}
+        </td>
+        <td>
+          <a href="/droplists/{{droplist.id}}/items/{{item.id}}">view</a>
+        </td>
+      </tr>
+      {%endfor%}
+    </table>
+    {%else%}
+    <div>
+      <p>Nothing to see here but us stockers!</p>
+    </div>
+    {%endif%}
   </div>
-  {%endif%}
 </div>
 {%endblock%}

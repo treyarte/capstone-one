@@ -101,4 +101,4 @@ def delete_droplist_item(droplist_id, item_id):
     db.session.commit()
 
     flash("successfully deleted the item", "success")
-    return redirect(f"/droplists/{droplist.id}/items")
+    return redirect(f"/droplists/{droplist.id}")

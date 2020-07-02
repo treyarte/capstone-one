@@ -27,11 +27,30 @@
     </div>
     {%for item in values %}
     <div class="item">
-      <span class="item-info"
-        >{{item.row_letter}}{{item.column_number}} {{item.description}}</span
-      >
-      <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
+      <div class="row">
+        <div class="col-6">
+          <span class="item-info"
+            >{{item.row_letter.upper()}}{{item.column_number}}
+            {{item.description.capitalize()}}</span
+          >
+        </div>
+        <div class="col-3">
+          <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
+        </div>
+        <div class="col-3">
+          <form
+            action="/droplists/{{droplist.id}}/items/{{item.id}}/delete"
+            method="post"
+            class="d-inline delete-item-form"
+          >
+            <button type="submit" class="delete-item-btn">
+              <span class="text-danger far fa-trash-alt"></span>
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
+
     {%endfor%}
   </div>
 

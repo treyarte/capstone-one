@@ -1,9 +1,10 @@
 {%extends "base.html"%} {%block content%}
-<form method="post">
-  {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-  "hidden"%} {%for error in field.errors%}
-  <span class="text-danger">{{error}}</span>
-  {%endfor%}{{field.label}}{{field(class_="form-control")}} {%endfor%}
-  <button class="btn btn-success">Create</button>
-</form>
+<div class="container">
+  <div class="custom-container">
+    <form method="post">
+      {%include "form.html"%}
+      <button class="btn btn-primary custom-btn">Create</button>
+    </form>
+  </div>
+</div>
 {%endblock%}
