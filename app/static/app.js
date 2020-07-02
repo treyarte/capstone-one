@@ -7,8 +7,13 @@ $(document).ready(function () {
 });
 
 async function get_graph() {
-  const resp = await axios.get(`${BASE_URL}/forklift_drivers/droplists`);
-  $('.graph-content').append(`<img src="${resp.data}" class="chart"/>`);
+  let status = $('#chart-status').val();
+  let type = $('#chart-type').val();
+  const resp = await axios.post(`${BASE_URL}/forklift_drivers/droplists`, {
+    status,
+    type,
+  });
+  $('.graph-content').empty().append(`<img src="${resp.data}" class="chart"/>`);
 }
 
 $graph.on('click', get_graph);

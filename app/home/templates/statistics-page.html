@@ -2,7 +2,24 @@
 <div class="container">
   <div class="custom-container">
     <h2 class="custom-header">Statistics</h2>
-    <button class="all-forklifts">Show</button>
+    <form action="/api/forklift_drivers/droplists" method="post">
+      <label for="chart-type">Chart Type</label>
+      <select name="chart-type" id="chart-type" class="form-control">
+        <option value="bar">Bar</option>
+        <option value="pie">Pie</option>
+        <option value="doughnut">Doughnut</option>
+      </select>
+
+      <label for="chart-status">Droplist Status</label>
+      <select name="chart-status" id="chart-status" class="form-control">
+        <option value="completed">Completed</option>
+        <option value="accepted">Accepted</option>
+        <option value="declined">Declined</option>
+      </select>
+    </form>
+    <button class="all-forklifts btn btn-lg btn-primary custom-btn">
+      Show Graph
+    </button>
 
     <div class="graph-content"></div>
   </div>

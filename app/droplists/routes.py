@@ -115,10 +115,25 @@ def edit_drop_list(droplist_id):
 
         db.session.commit()
 
-        flash("Drop list successfully updated", "success")
+        flash("Droplist successfully updated", "success")
         return redirect(f"/droplists/{droplist_id}")
     
     return render_template("/droplist_edit.html", form=form, droplist=droplist)
+
+@droplist_routes.route("/<int:droplist_id>/complete", methods=["POST"])
+@authorize
+@check_driver
+@check_droplist_access
+def complete_droplist(droplist_id):
+    """complete the droplist"""
+    droplist = DropList.query.get_or_404(droplist_id)
+
+    droplist.is_complete = True
+    droplist.status="completed"
+    db.session.commit()
+
+    flash("Droplist completed", "success")
+    return redirect(f"/droplists/{droplist.id}")
 
 @droplist_routes.route("/<int:droplist_id>/delete", methods=["POST"])
 @authorize

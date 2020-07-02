@@ -23,6 +23,7 @@
         <strong>Date:</strong> {{droplist.timestamp.strftime('%b %d, %y
         %I:%M%p')}}
       </div>
+      {%if not droplist.is_complete%}
       <div class="row mt-1">
         {%if g.user.current_role.role == "stocker"%}
         <div class="col-6">
@@ -84,6 +85,7 @@
         </div>
         {%endif%}
       </div>
+      {%endif%}
     </div>
 
     {%endfor%} {%else%}
