@@ -57,10 +57,10 @@ class LoginForm(FlaskForm):
 
 class ItemForm(FlaskForm):
     """Form for items"""
+    location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
     row_letter = SelectField("Row", validators=[InputRequired()], choices=[("a", "A"), ("b", "B"), ("c", "C")])
     column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
     description = StringField("Description")
-    location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
 
     def set_choices(self, db, obj):
         self.location_id.choices = db.session.query(obj.id, obj.name).all()

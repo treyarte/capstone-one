@@ -1,8 +1,3 @@
 $(document).ready(function () {
-  $('[data-toggle="tooltip"]')
-    .tooltip({
-      trigger: 'manual',
-      placement: 'bottom',
-    })
-    .tooltip('show');
+  $('[data-toggle="tooltip"]').tooltip();
 });

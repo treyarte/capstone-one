@@ -38,7 +38,7 @@ def add_item_to_drop_list(droplist_id):
         db.session.add(item)
         db.session.commit()
 
-        return redirect(f"/droplists/{droplist.id}/items")
+        return redirect(f"/droplists/{droplist.id}")
 
     return render_template("/droplist_items_new.html", form=form)
 
@@ -79,8 +79,8 @@ def edit_droplist_item(droplist_id, item_id):
 
         db.session.commit()
 
-        flash("Item successfully updated")
-        return redirect(f"/droplists/{droplist_id}/items/{item_id}")
+        flash("Item successfully updated", "success")
+        return redirect(f"/droplists/{droplist_id}")
 
     return render_template("/droplist_items_edit.html", form=form)
 

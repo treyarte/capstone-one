@@ -1,0 +1,13 @@
+{%extends "base.html"%}{%block content%}
+<div class="container">
+  <div class="custom-container">
+    <h2 class="custom-header">Create Droplist</h2>
+    <form action="/droplists/new" method="post">
+      {%include "form.html"%}
+      <button type="submit" class="btn btn-lg btn-success custom-btn">
+        Create Droplist
+      </button>
+    </form>
+  </div>
+</div>
+{%endblock%}

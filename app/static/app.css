@@ -9,6 +9,18 @@ body {
   height: 100%;
 }
 
+.custom-btn {
+  margin-top: 1rem;
+}
+
+.custom-container {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 5px -2px #393e46;
+  margin-top: 1rem;
+}
+
 .custom-header {
   text-align: center;
   margin: 1rem 0;

@@ -40,7 +40,7 @@ def create_droplist():
         flash("Droplist successfully created", "success")
         return redirect(f"/droplists/{droplist.id}")
     
-    return render_template("/droplist_form.html", form=form)
+    return render_template("/droplist_new.html", form=form)
 
 @droplist_routes.route("/<int:droplist_id>")
 @authorize
@@ -118,7 +118,7 @@ def edit_drop_list(droplist_id):
         flash("Drop list successfully updated", "success")
         return redirect(f"/droplists/{droplist_id}")
     
-    return render_template("/droplist_edit.html", form=form)
+    return render_template("/droplist_edit.html", form=form, droplist=droplist)
 
 @droplist_routes.route("/<int:droplist_id>/delete", methods=["POST"])
 @authorize
