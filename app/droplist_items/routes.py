@@ -3,6 +3,7 @@ from app.models import DropList, Item, Location, db
 from app.forms import ItemForm
 from app.helpers.decorators import authorize, check_droplist_access, check_driver, check_stocker, check_droplist_owner
 
+
 droplist_items_route = Blueprint("droplist_items", __name__, url_prefix="/droplists", template_folder="templates")
 
 @droplist_items_route.route("/<int:droplist_id>/items")

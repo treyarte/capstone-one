@@ -1,10 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
+import json
+import requests
 from app.helpers.decorators import authorize
 from app.models import ForkliftDriver, db, DropList
+from app.helpers.api_methods import send_data, create_chart
 
 api = Blueprint("api", __name__, url_prefix="/api")
 
-@api.route("/forklift_driver/droplist_chart")
+@api.route("/forklift_drivers/droplists")
 @authorize
 def get_all_accepted_drivers_droplist():
     """Return the number of droplist accepted for all drivers"""
@@ -24,15 +27,16 @@ def get_all_accepted_drivers_droplist():
         num_droplists.append(droplist_count)
 
     chart_dict = {
-        "type": chart_type,
-        "data": {
-            "labels": drivers_names,
+        "type":chart_type,
+        "data":{
+            "labels":drivers_names,
             "datasets":[{
-                "label": "Forklift Drivers",
-                "data": num_droplists
-            
+                "label":"Forklift Drivers",
+                "data":num_droplists
             }]
         }
     }
+    chart_data = json.dumps(chart_dict)
+    resp = create_chart(300, 668, chart_type, chart_dict)
 
-    return jsonify(chart_dict)
+    return resp

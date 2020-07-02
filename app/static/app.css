@@ -192,6 +192,12 @@ body {
   background-color: #212121;
 }
 
+/**stats css**/
+.chart {
+  height: auto;
+  max-width: 100%;
+}
+
 /**desktop queries**/
 @media only screen and (min-width: 991px) {
   .custom-header {
