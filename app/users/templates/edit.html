@@ -1,11 +1,11 @@
 {%extends "base.html"%} {%block content%}
-<form action="/users/settings" method="post">
-  {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-  "hidden"%} {%for error in field.errors%}
-  <span class="text-danger">{{error}}</span>
-  {%endfor%} {{field(placeholder=field.label.text, class="form-control")}}
-  {%endfor%}
-
-  <button class="btn btn-primary">Update</button>
-</form>
+<div class="container">
+  <div class="custom-container">
+    <h2 class="custom-header">Settings</h2>
+    <form action="/users/settings" method="post">
+      {%include "form.html"%}
+      <button class="btn btn-lg btn-primary custom-btn">Update</button>
+    </form>
+  </div>
+</div>
 {%endblock%}

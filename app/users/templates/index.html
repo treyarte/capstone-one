@@ -1,7 +1,17 @@
-{%extends "base.html"%}{%block content%} {%for user in users%}
-<div>
-  <a href="/users/{{user.id}}">
-    {{user.first_name}} {{user.last_name}}
-  </a>
+{%extends "base.html"%}{%block content%}
+<div class="container">
+  <div class="custom-container">
+    <h2 class="custom-header">Users</h2>
+    {%for user in users%}
+    <ul class="users-list">
+      <li class="users">
+        <a href="/users/{{user.id}}" class="btn btn-link">
+          {{user.first_name}} {{user.last_name}}
+        </a>
+      </li>
+    </ul>
+
+    {%endfor%}
+  </div>
 </div>
-{%endfor%} {%endblock%}
+{%endblock%}

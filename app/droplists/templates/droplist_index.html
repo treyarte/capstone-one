@@ -5,6 +5,11 @@
     {%for droplist in droplists%}
 
     <div class="droplist col-12 col-md-12 col-lg-5">
+      <form action="/droplists/{{droplist.id}}/delete" method="post">
+        <button type="submit" class="delete-dl-btn btn">
+          <span class="far fa-trash-alt"></span>
+        </button>
+      </form>
       <h5>
         {{droplist.description}}
         <a href="/droplists/{{droplist.id}}" class="btn-link">view</a>

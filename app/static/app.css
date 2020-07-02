@@ -11,6 +11,7 @@ body {
 
 .custom-btn {
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .custom-container {
@@ -30,6 +31,11 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.delete-dl-btn {
+  color: #ea5455;
+  float: right;
 }
 
 .msg-container {
