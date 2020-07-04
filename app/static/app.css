@@ -141,6 +141,16 @@ body {
   display: inline-block;
 }
 
+.tooltip-wrapper {
+  display: flex;
+  float: right;
+}
+.fa-question {
+  color: #706c61;
+  align-self: flex-end;
+  margin-right: 0.5rem;
+}
+
 /**droplist status css**/
 .not.sent {
   background-color: #868e96;
@@ -243,6 +253,9 @@ body {
 
   .tooltip-wrapper .droplist-link {
     pointer-events: none;
+  }
+  .fa-question {
+    margin-top: 1.2rem;
   }
 
   /**landing css**/

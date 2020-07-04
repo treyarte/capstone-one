@@ -1,22 +1,24 @@
 {%extends "base.html"%} {%block content%}
 <div class="container">
-  <h2 class="custom-header">Sign Up</h2>
-  <form action="/sign-up" method="post">
-    <div class="form-row">
-      {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-      "hidden"%} {%for error in field.errors%}
-      <span class="text-danger">{{error}}</span>
-      {%endfor%}
-      <div class="form-group col-lg-12">
-        {{field.label}} {{field(placeholder=field.label.text,
-        class="form-control")}}
+  <div class="custom-container">
+    <h2 class="custom-header">Sign Up</h2>
+    <form action="/sign-up" method="post">
+      <div class="form-row">
+        {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
+        "hidden"%} {%for error in field.errors%}
+        <span class="text-danger">{{error}}</span>
+        {%endfor%}
+        <div class="form-group col-lg-12">
+          {{field.label}} {{field(placeholder=field.label.text,
+          class="form-control")}}
+        </div>
+        {%endfor%}
       </div>
-      {%endfor%}
-    </div>
-    <div class="btn-container">
-      <button class="btn btn-dark signup-btn" type="submit">Sign Up!</button>
-    </div>
-  </form>
+      <div class="btn-container">
+        <button class="btn btn-dark signup-btn" type="submit">Sign Up!</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {%endblock%}

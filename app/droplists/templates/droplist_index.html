@@ -41,6 +41,13 @@
         <div class="col-6">
           {%if not droplist.droplist_items%}
           <div class="tooltip-wrapper">
+            <span
+              class="fas fa-question"
+              aria-disabled="true"
+              data-toggle="tooltip"
+              placement="bottom"
+              title="Cant send an empty droplist. Click the view link to add items."
+            ></span>
             <a
               href="/droplists/{{droplist.id}}/send"
               class="btn btn-dark droplist-btn droplist-link disabled"
@@ -97,10 +104,13 @@
     <div>You do not have any droplists!</div>
     {%endif%}
   </div>
+
   <a href="/droplists/new" class="btn btn-lg btn-success droplist-create-btn"
     ><span class="fas fa-plus"></span
   ></a>
-  <a href="/droplists/new" class="btn btn-success droplist-create-btn-lg"
+  <a
+    href="/droplists/new"
+    class="btn btn-success droplist-create-btn-lg custom-btn"
     >Create Droplist</a
   >
 </div>
