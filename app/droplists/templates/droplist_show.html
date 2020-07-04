@@ -34,6 +34,7 @@
             {{item.description.capitalize()}}</span
           >
         </div>
+        {%if g.user.current_role.role=="stocker"%}
         <div class="col-3">
           <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
         </div>
@@ -48,6 +49,7 @@
             </button>
           </form>
         </div>
+        {%endif%}
       </div>
     </div>
 

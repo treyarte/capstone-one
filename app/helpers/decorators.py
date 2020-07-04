@@ -89,3 +89,27 @@ def check_driver(func):
         return func(*args, **kwargs)
     return inner_function
 
+def check_items(func):
+    """check if a droplist have items"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        droplist = DropList.query.get_or_404(kwargs.get("droplist_id"))
+
+        if not droplist.droplist_items:
+            flash("Droplist cannot be empty", "danger")
+            return redirect("/")
+        return func(*args, **kwargs)
+    return inner_function
+
+def check_complete(func):
+    """check if a droplist is complete or not"""
+    @wraps(func)
+    def inner_function(*args, **kwargs):
+        droplist = DropList.query.get_or_404(kwargs.get("droplist_id"))
+
+        if droplist.status == "completed":
+            flash("Droplist is already complete", "warning")
+            return redirect("/")
+        return func(*args, **kwargs)
+    return inner_function
+

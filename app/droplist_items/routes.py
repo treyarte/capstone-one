@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, redirect
 from app.models import DropList, Item, Location, db
 from app.forms import ItemForm
-from app.helpers.decorators import authorize, check_droplist_access, check_driver, check_stocker, check_droplist_owner
+from app.helpers.decorators import authorize, check_droplist_access, check_driver, check_stocker, check_droplist_owner, check_complete
 
 
 droplist_items_route = Blueprint("droplist_items", __name__, url_prefix="/droplists", template_folder="templates")
@@ -19,6 +19,7 @@ def show_droplist_items(droplist_id):
 @authorize
 @check_stocker
 @check_droplist_owner
+@check_complete
 def add_item_to_drop_list(droplist_id):
     """Add an item to the drop list"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -60,6 +61,7 @@ def show_item(droplist_id,item_id):
 @authorize
 @check_stocker
 @check_droplist_owner
+@check_complete
 def edit_droplist_item(droplist_id, item_id):
     """edit a droplist item"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -89,6 +91,7 @@ def edit_droplist_item(droplist_id, item_id):
 @authorize
 @check_stocker
 @check_droplist_owner
+@check_complete
 def delete_droplist_item(droplist_id, item_id):
     """delete an item from a droplist"""
     droplist = DropList.query.get_or_404(droplist_id)

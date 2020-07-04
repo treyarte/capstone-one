@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, flash, redirect, request
 from app.models import ForkliftDriver, Stocker, get_droplists, db, DropList
 from app.forms import DropListForm
-from app.helpers.decorators import authorize, check_stocker, check_droplist_access, check_droplist_owner,check_driver
+from app.helpers.decorators import authorize, check_stocker, check_droplist_access, check_droplist_owner,check_driver, check_items, check_complete
 
 droplist_routes = Blueprint("droplists", __name__, url_prefix="/droplists", template_folder="templates")
 
@@ -54,6 +54,8 @@ def show_drop_list(droplist_id):
 @authorize
 @check_stocker
 @check_droplist_owner
+@check_complete
+@check_items
 def send_droplist(droplist_id):
     """connects a droplist to a driver"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -82,6 +84,7 @@ def send_droplist(droplist_id):
 @authorize
 @check_driver
 @check_droplist_access
+@check_complete
 def droplist_accept_decline(droplist_id):
     """driver accepts or declines a droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -103,6 +106,7 @@ def droplist_accept_decline(droplist_id):
 @authorize
 @check_stocker
 @check_droplist_owner
+@check_complete
 def edit_drop_list(droplist_id):
     """Allow the user to edit their drop list"""
     droplist = DropList.query.get_or_404(droplist_id)
@@ -124,10 +128,14 @@ def edit_drop_list(droplist_id):
 @authorize
 @check_driver
 @check_droplist_access
+@check_complete
 def complete_droplist(droplist_id):
     """complete the droplist"""
     droplist = DropList.query.get_or_404(droplist_id)
 
+    if droplist.status != "accepted":
+        flash("Droplist must be accepted before you can complete it", "warning")
+        return redirect("/")
     droplist.is_complete = True
     droplist.status="completed"
     db.session.commit()
