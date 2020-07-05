@@ -9,6 +9,24 @@ body {
   height: 100%;
 }
 
+/**404 css**/
+.not-found-container {
+  margin-top: 1rem;
+}
+
+.not-found-bg {
+  display: block;
+  background: url('./custom_404.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  height: 65%;
+  width: 100%;
+  position: absolute;
+
+  z-index: -1;
+}
+
 .custom-btn {
   margin-top: 1rem;
   margin-bottom: 1rem;
