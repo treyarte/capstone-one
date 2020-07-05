@@ -1,4 +1,4 @@
-from app.models import Role, User, Stocker, ForkliftDriver, DropList, db
+from app.models import Role, User, Stocker, ForkliftDriver, DropList, db, Item, Location
 
 def droplist_setup():
     User.query.delete()
@@ -47,5 +47,22 @@ def droplist_setup():
     db.session.commit()
 
     values.extend([droplist, droplist_2, droplist_3])
+
+    loc = Location(name="S409")
+    
+    db.session.add(loc)
+    db.session.commit()
+    
+    item_1 = Item(
+                row_letter="a", 
+                column_number=1, 
+                location_id=loc.id, 
+                description="Test Item 1", 
+                droplist_id= droplist_2.id)
+        
+    db.session.add(item_1)
+    db.session.commit()
+
+
 
     return values

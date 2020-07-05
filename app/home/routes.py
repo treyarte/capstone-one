@@ -18,3 +18,8 @@ def stats_page():
     """Page where user can create graphs"""
 
     return render_template("statistics-page.html")
+
+@home.route("/about")
+def about_page():
+    """Page explaining the purpose of the app"""
+    return render_template("about.html")

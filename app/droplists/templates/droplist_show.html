@@ -26,7 +26,11 @@
       </h3>
     </div>
     {%for item in values %}
-    <div class="item">
+    <div
+      class="item"
+      data-item_id="{{item.id}}"
+      data-droplist_id="{{droplist.id}}"
+    >
       <div class="row">
         <div class="col-6">
           <span class="item-info"
@@ -34,10 +38,12 @@
             {{item.description.capitalize()}}</span
           >
         </div>
-        {%if g.user.current_role.role=="stocker"%}
+        {%if g.user.current_role.role == "stocker"%} {%if droplist.status ==
+        "not sent"%}
         <div class="col-3">
           <a href="/droplists/{{droplist.id}}/items/{{item.id}}/edit">Edit</a>
         </div>
+        {%endif%} {%if droplist.status == "not sent"%}
         <div class="col-3">
           <form
             action="/droplists/{{droplist.id}}/items/{{item.id}}/delete"
@@ -49,7 +55,7 @@
             </button>
           </form>
         </div>
-        {%endif%}
+        {%endif%} {%endif%}
       </div>
     </div>
 

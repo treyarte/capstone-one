@@ -23,8 +23,6 @@ def signUp():
     """Signs a user up to the system"""
     form = SignUpForm()
 
-    form.user_role.choices = db.session.query(Role.id, Role.role).all()
-
     if form.validate_on_submit():
         try:
             user = User.sign_up(
