@@ -3,7 +3,7 @@ $graph = $('.all-forklifts');
 async function get_graph() {
   let status = $('#chart-status').val();
   let type = $('#chart-type').val();
-  const resp = await axios.post(`${BASE_URL}/forklift_drivers/droplists`, {
+  const resp = await axios.post(`${BASE_URL}/api/forklift_drivers/droplists`, {
     status,
     type,
   });

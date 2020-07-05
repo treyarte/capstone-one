@@ -5,7 +5,10 @@
   <div class="row">
     {%for droplist in droplists%}
 
-    <div class="droplist col-12 col-md-12 col-lg-5">
+    <div
+      class="droplist col-12 col-md-12 col-lg-5"
+      data-droplist_id="{{droplist.id}}"
+    >
       {%if g.user.current_role.role == "stocker"%}
       <form action="/droplists/{{droplist.id}}/delete" method="post">
         <button type="submit" class="delete-dl-btn btn">

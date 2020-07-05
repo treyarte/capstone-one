@@ -16,7 +16,7 @@ body {
 
 .not-found-bg {
   display: block;
-  background: url('./custom_404.png');
+  background: url('./images/custom_404.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -99,7 +99,7 @@ body {
 
 .landing-img-small {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url('./landing_img_small.jpg');
+    url('./images/landing_img_small.jpg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -185,7 +185,7 @@ body {
   color: var(--status-text-color);
 }
 
-.rejected {
+.declined {
   background-color: #d9534f;
   color: var(--status-text-color);
 }
@@ -283,7 +283,7 @@ body {
   .landing-img-med {
     display: block;
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-      url('./landing_img_med.jpg');
+      url('./images/landing_img_med.jpg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;

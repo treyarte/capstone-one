@@ -20,15 +20,14 @@
             id="driverId"
             value="{{driver.id}}"
           />
+          {%if driver.id != droplist.forklift_driver_id or droplist.status !=
+          "sent" and droplist.status != "accepted"%}
           <button type="submit" class="btn btn-sm btn-primary">Send</button>
+          {%else%} {%endif%}
         </form>
       </li>
-      {%if driver.id != droplist.forklift_driver_id or droplist.status != "sent"
-      and droplist.status != "accepted"%}
     </ul>
-    {%else%}
-    <button disabled="disabled">Sent</button>
-    {%endif%} {%endfor%} {%else%}
+    {%endfor%} {%else%}
     <div>No drivers available</div>
     {%endif%}
   </div>
