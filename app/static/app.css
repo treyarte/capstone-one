@@ -53,6 +53,7 @@ body {
 
 .delete-dl-btn {
   color: #ea5455;
+
   float: right;
 }
 
@@ -61,6 +62,7 @@ body {
   padding: 0;
   float: right;
   margin-right: 0.5rem;
+  background-color: transparent;
 }
 
 .msg-container {

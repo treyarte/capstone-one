@@ -59,14 +59,14 @@ class ItemForm(FlaskForm):
     """Form for items"""
     location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
     row_letter = SelectField("Row", validators=[InputRequired()], choices=[("a", "A"), ("b", "B"), ("c", "C")])
-    column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
+    column_number = IntegerField("Column Number", validators=[InputRequired(), NumberRange(min=1, max=100)])
     description = StringField("Description")
 
     def set_choices(self, db, obj):
         self.location_id.choices = db.session.query(obj.id, obj.name).all()
 
 class DropListForm(FlaskForm):
-    description = StringField("Description", validators=[DataRequired(message="Description cannot be blank"), Length(min=3, max=100)])
+    description = StringField("Name", validators=[DataRequired(message="Description cannot be blank"), Length(min=3, max=100)])
 
     department = SelectField("Department", validators=[InputRequired()], choices=[("hardlines", "Hardlines"), ("freezer", "Freezer"), 
                                             ("receiving", "Receiving"), ("sundries","Sundries")], coerce=str)
@@ -84,7 +84,7 @@ class LocationForm(FlaskForm):
 class ItemForm(FlaskForm):
     """Form for items"""
     row_letter = SelectField("Row", validators=[InputRequired()], choices=[("a", "A"), ("b", "B"), ("c", "C")])
-    column_number = IntegerField("Column", validators=[InputRequired(), NumberRange(min=1, max=100)])
+    column_number = IntegerField("Column Number", validators=[InputRequired(), NumberRange(min=1, max=100)])
     description = StringField("Description")
     location_id = SelectField("Location", validators=[InputRequired()], coerce=int)
 
