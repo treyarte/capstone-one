@@ -2,7 +2,7 @@
 
 https://mydroplist.herokuapp.com/
 
-A web application that can help facilitate better communication between stockers and forklift drivers and provide record-keeping for users. See your forklift drivers' performance by creating graphs of the droplists they have completed, accepted, and declined.
+A web application that was created by me, Treyvion Johnson for my capstone project at Springboard's coding bootcamp. The app helps facilitate better communication between stockers and forklift drivers and provide record-keeping for users. See your forklift drivers' performance by creating graphs of the droplists they have completed, accepted, and declined.
 
 ### Background Information
 
