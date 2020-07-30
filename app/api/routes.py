@@ -24,7 +24,7 @@ def get_all_accepted_drivers_droplist():
         droplist_count = db.session.query(DropList).join(
             ForkliftDriver, ForkliftDriver.id == DropList.forklift_driver_id).filter(DropList.status==status_filter).filter(
                 ForkliftDriver.id == driver.id).count()
-        num_droplists.append(droplist_count)
+        num_droplists.append([driver.full_name, droplist_count])
 
     chart_dict = {
         "type":chart_type,
@@ -47,4 +47,4 @@ def get_all_accepted_drivers_droplist():
     chart_data = json.dumps(chart_dict)
     resp = create_chart(400, 668, chart_type, chart_dict)
 
-    return resp
+    return {"data": num_droplists}
