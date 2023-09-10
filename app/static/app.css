@@ -120,6 +120,12 @@ body {
   z-index: 1;
 }
 
+/** Login **/
+.login-btn-container {
+  display: flex;
+  gap: 1rem;
+}
+
 /**Droplists css**/
 .droplist-btn {
   float: right;
